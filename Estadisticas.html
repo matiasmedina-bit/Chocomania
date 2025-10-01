@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-16 Estadísticas (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing:border-box; } /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+    .small{ font-size:.85rem; color:#555; }
+
+    /* Secciones */
+    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+
+    /* Reporte mensual (lista de meses + KPIs) */
+    .report{
+      display:grid; grid-template-columns: 260px 1fr; gap:var(--gap); /* GRID SYSTEM */
+    }
+    @media (max-width: 920px){ .report{ grid-template-columns: 1fr; } }
+
+    .picker{ border:1px dashed #ddd; border-radius:10px; padding:12px; background:#fff; }
+    .month-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; } /* FLEX */
+    .month-list li{ display:flex; align-items:center; gap:8px; } /* FLEX */
+    .summary{
+      border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff;
+      display:flex; flex-direction:column; gap:10px; justify-content:center; min-height:140px; /* FLEX */
+    }
+    .kpi{ font-size:1.15rem; } .kpi b{ font-size:1.25rem; }
+
+    /* Panel de estadísticas (ranking) */
+    .stats{
+      display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap);  /* GRID SYSTEM */
+      border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff;
+    }
+    .box{ border:1px dashed #cfcfcf; border-radius:10px; padding:12px; background:#fafafa; }
+    .box h4{ margin-top:0; }
+    ol{ margin:0; padding-left:18px; }
+    .muted{ color:#555; }
+
+    a.btn { display:inline-block; margin-top:6px; padding:8px 12px; border:1px solid #666; border-radius:999px; background:#eee; text-decoration:none; color:inherit; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-16 • Estadísticas</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- ================= Escenario 1: Enero 2025 con enlace a Estadísticas ================= -->
+  <section class="section" aria-labelledby="esc1">
+    <h2 id="esc1">Reportes mensuales — Enero 2025</h2>
+
+    <div class="report">
+      <aside class="picker">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label for="m1"><b>Fecha</b></label>
+          <button class="btn" type="button">▼</button>
+        </div>
+        <ul class="month-list" id="m1">
+          <li><label><input type="checkbox" disabled /> Noviembre/2024</label></li>
+          <li><label><input type="checkbox" disabled /> Diciembre/2024</label></li>
+          <li><label><input type="checkbox" checked /> <b>Enero/2025</b></label></li>
+          <li><label><input type="checkbox" disabled /> Febrero/2025</label></li>
+        </ul>
+      </aside>
+
+      <section class="summary">
+        <div class="kpi"><b>Pedidos Totales:</b> 227</div>
+        <div class="kpi"><b>Ingresos:</b> $1.254.728</div>
+        <a class="btn" href="#stats-ene">Estadísticas</a>
+      </section>
+    </div>
+  </section>
+
+  <!-- Panel de estadísticas Enero 2025 -->
+  <section id="stats-ene" class="section" aria-labelledby="esc1-stats">
+    <h2 id="esc1-stats">Estadísticas — Enero 2025</h2>
+    <div class="stats">
+      <div class="box">
+        <h4>Productos (Top 5)</h4>
+        <ol>
+          <li>Chocolate Dubai</li>
+          <li>Bombones Surtidos</li>
+          <li>Frutillas con chocolate</li>
+          <li>Chocolate Amargo 70%</li>
+          <li>Chocolate Caliente</li>
+        </ol>
+      </div>
+      <div class="box">
+        <h4>Vendidos</h4>
+        <ol class="muted">
+          <li>72 pedidos</li>
+          <li>64 pedidos</li>
+          <li>47 pedidos</li>
+          <li>29 pedidos</li>
+          <li>14 pedidos</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Escenario 2: Cambio de período a Febrero 2025 ================= -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Reportes mensuales — Febrero 2025</h2>
+
+    <div class="report">
+      <aside class="picker">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label for="m2"><b>Fecha</b></label>
+          <button class="btn" type="button">▼</button>
+        </div>
+        <ul class="month-list" id="m2">
+          <li><label><input type="checkbox" disabled /> Diciembre/2024</label></li>
+          <li><label><input type="checkbox" disabled /> Enero/2025</label></li>
+          <li><label><input type="checkbox" checked /> <b>Febrero/2025</b></label></li>
+          <li><label><input type="checkbox" disabled /> Marzo/2025</label></li>
+        </ul>
+      </aside>
+
+      <section class="summary">
+        <div class="kpi"><b>Pedidos Totales:</b> 328</div>
+        <div class="kpi"><b>Ingresos:</b> $1.972.694</div>
+        <a class="btn" href="#stats-feb">Estadísticas</a>
+      </section>
+    </div>
+  </section>
+
+  <!-- Panel de estadísticas Febrero 2025: placeholders para ranking -->
+  <section id="stats-feb" class="section" aria-labelledby="esc2-stats">
+    <h2 id="esc2-stats">Estadísticas — Febrero 2025</h2>
+    <div class="stats">
+      <div class="box">
+        <h4>Productos (Top 5)</h4>
+        <ol>
+          <li>Trufa Avellana</li>
+          <li>Bombón Amargo</li>
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ol>
+      </div>
+      <div class="box">
+        <h4>Clientes frecuentes (Top 5)</h4>
+        <ol class="muted">
+          <li>ana@example.com</li>
+          <li>pedro@example.com</li>
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

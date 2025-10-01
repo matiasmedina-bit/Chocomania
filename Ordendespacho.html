@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-12 Orden de despacho (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing: border-box; }                                 /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+    .small{ font-size:.85rem; color:#555; }
+
+    /* Secciones / tarjetas */
+    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+    .modal{
+      width:min(440px, 92vw); margin:10px auto; padding:16px;
+      border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa;
+      display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; /* FLEX */
+    }
+    .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+
+    /* Detalle de orden (asignación) */
+    .order{
+      border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff;
+      display:grid; gap:10px;                          /* GRID SYSTEM */
+    }
+    .order h3{ margin:0; }
+    .kv{ display:grid; grid-template-columns: 160px 1fr; gap:8px; } /* GRID */
+    .kv div{ padding:6px 10px; border:1px dashed #ddd; border-radius:8px; background:#fafafa; }
+
+    /* Historial de despachos */
+    .history{
+      display:grid; gap:10px;                          /* GRID SYSTEM */
+      border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff;
+    }
+    .item{
+      display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center;  /* GRID */
+      border:1px dashed #ddd; border-radius:10px; padding:10px; background:#fafafa;
+      font-weight:700;
+    }
+    .ok{ color:#2c6b2c; } .bad{ color:#7a2e2e; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-12 • Orden de despacho</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- Esc 1: generación automática al confirmar pedido -->
+  <section class="section" aria-labelledby="esc1">
+    <h2 id="esc1">Escenario 1 — Generación automática</h2>
+    <div class="modal">
+      <strong>Orden despacho</strong>
+      <p><b>ORD-2025-120</b><br>generando datos…</p>
+      <button class="btn" type="button">Aceptar</button>
+    </div>
+  </section>
+
+  <!-- Esc 2: asignación de repartidor (dirección, productos, repartidor) -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Escenario 2 — Asignación de repartidor</h2>
+    <div class="order">
+      <h3>Orden despacho</h3>
+      <div class="kv">
+        <div>Dirección</div><div>ictinos 201 — Comuna Centro</div>
+        <div>Productos</div><div>chocolate dubai; bombones surtidos</div>
+        <div>Repartidor</div><div>Jhon Jairo</div>
+      </div>
+      <div style="text-align:center;"><button class="btn" type="button">Aceptar</button></div>
+    </div>
+  </section>
+
+  <!-- Esc 3: registro en historial de bodega -->
+  <section class="section" aria-labelledby="esc3">
+    <h2 id="esc3">Escenario 3 — Historial de despachos</h2>
+    <div class="history">
+      <div class="item"><span>ORD-2025-120:</span> <span class="ok">ENTREGADO</span></div>
+      <div class="item"><span>ORD-2025-119:</span> <span class="ok">ENTREGADO</span></div>
+      <div class="item"><span>ORD-2025-118:</span> <span class="bad">CANCELADO</span></div>
+      <div class="item"><span>ORD-2025-117:</span> <span class="ok">ENTREGADO</span></div>
+    </div>
+  </section>
+</body>
+</html>

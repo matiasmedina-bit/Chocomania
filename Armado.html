@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-06 Carrito de compras (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing: border-box; } /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+    .small{ font-size:.85rem; color:#555; }
+
+    /* Caja/sección */
+    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+
+    /* === Catálogo (Esc 1) === */
+    .controls{ display:flex; gap:var(--gap); align-items:center; flex-wrap:wrap; margin-bottom:var(--gap); } /* FLEX */
+    .controls input[type="search"], .controls select{ padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fafafa; }
+    .icon-btn{ padding:8px 12px; border:1px solid #888; border-radius:10px; background:#eee; }
+    .grid-products{
+      display:grid; gap:var(--gap);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));   /* GRID SYSTEM */
+    }
+    .p-card{
+      border:1px dashed #bdbdbd; border-radius:10px; padding:12px; min-height:160px; /* BOX MODEL */
+      display:flex; flex-direction:column; gap:8px; align-items:flex-start;           /* FLEX */
+      background:#fff;
+    }
+    .p-thumb{ width:100%; height:90px; border:1px dashed #ddd; border-radius:8px; background:#fafafa; }
+    .p-name{ font-weight:700; }
+    .p-price{ color:#444; }
+    .btn{ padding:8px 12px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+
+    /* === Carrito (Esc 1/2/3) === */
+    .cart-line{
+      display:grid;                                /* GRID SYSTEM */
+      grid-template-columns: 120px 1fr 170px;
+      gap:var(--gap);
+      align-items:start;
+      padding:12px; border:1px dashed #c9c9c9; border-radius:10px;  /* BOX MODEL */
+      background:#fff;
+    }
+    @media (max-width:780px){ .cart-line{ grid-template-columns: 100px 1fr; } }
+
+    .thumb{ width:100%; height:90px; border:1px dashed #ccc; border-radius:10px; background:#fafafa; }
+    .info{ display:flex; flex-direction:column; gap:4px; } /* FLEX */
+    .name{ font-weight:700; }
+    .price{ color:#444; }
+    .qty-panel{
+      border:1px dashed #bbb; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:10px; align-items:stretch; /* FLEX */
+    }
+    .qty{
+      display:flex; align-items:center; justify-content:space-between; gap:8px; /* FLEX */
+      border:1px dashed #ccc; border-radius:10px; padding:6px 10px;
+    }
+    .total{ text-align:right; font-weight:800; }
+    .tools{ display:flex; gap:8px; align-items:center; } /* FLEX */
+    .ghost{ opacity:.5 }
+
+    .totals{
+      display:flex; justify-content:flex-end; margin-top:10px; /* FLEX */
+      font-weight:700;
+    }
+    .cta{ display:flex; justify-content:flex-end; margin-top:10px; } /* FLEX */
+    .cta > .btn{ padding:10px 16px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-06 • Carrito de compras</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- ================= Escenario 1: agregar al carrito desde catálogo ================= -->
+  <section class="section" aria-labelledby="esc1">
+    <h2 id="esc1">Escenario 1 — Agregar producto al carrito (desde catálogo)</h2>
+    <div class="controls">
+      <input type="search" placeholder="Buscar producto" />
+      <select aria-label="Categorías">
+        <option>Categorías</option><option>Chocolates</option><option>Bombones</option><option>Trufas</option>
+      </select>
+      <button class="icon-btn" type="button">🛒</button>
+    </div>
+
+    <div class="grid-products">
+      <article class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate Dubai</div>
+        <div class="p-price">$5.000</div>
+        <button class="btn" type="button">Agregar al carrito</button>
+      </article>
+
+      <article class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Bombones surtidos</div>
+        <div class="p-price">$4.500</div>
+        <button class="btn" type="button">Agregar al carrito</button>
+      </article>
+
+      <article class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Trufa de cacao</div>
+        <div class="p-price">$2.500</div>
+        <button class="btn" type="button">Agregar al carrito</button>
+      </article>
+      <!-- …más productos de ejemplo -->
+    </div>
+  </section>
+
+  <!-- Resultado del Esc 1: carrito con 1 ítem (cantidad = 1) -->
+  <section class="section">
+    <h3>Carrito (después de agregar 1)</h3>
+    <div class="cart-line">
+      <div class="thumb"></div>
+      <div class="info">
+        <div class="name">Producto: Chocolate Dubai</div>
+        <div class="price">Precio producto: $5.000</div>
+      </div>
+      <div class="qty-panel">
+        <div class="qty"><span>−</span><strong>1</strong><span>＋</span></div>
+        <div class="tools ghost">🗑 Eliminar</div>
+      </div>
+    </div>
+    <div class="totals">TOTAL: $5.000</div>
+    <div class="cta"><button class="btn" type="button">Finalizar y Comprar</button></div>
+  </section>
+
+  <!-- ================= Escenario 2: actualizar cantidad a 4 ================= -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Escenario 2 — Actualizar cantidad a 4</h2>
+    <div class="cart-line">
+      <div class="thumb"></div>
+      <div class="info">
+        <div class="name">Producto: Chocolate Dubai</div>
+        <div class="price">Precio producto: $5.000</div>
+      </div>
+      <div class="qty-panel">
+        <div class="qty"><span>−</span><strong>4</strong><span>＋</span></div>
+        <div class="tools ghost">🗑 Eliminar</div>
+      </div>
+    </div>
+    <div class="totals">TOTAL: $20.000</div>
+    <div class="cta"><button class="btn" type="button">Finalizar y Comprar</button></div>
+  </section>
+
+  <!-- ================= Escenario 3: carrito con 2 productos + eliminar ================= -->
+  <section class="section" aria-labelledby="esc3">
+    <h2 id="esc3">Escenario 3 — Carrito con 2 productos y opción de eliminar</h2>
+
+    <div class="cart-line">
+      <div class="thumb"></div>
+      <div class="info">
+        <div class="name">Producto: Chocolate Dubai</div>
+        <div class="price">Precio producto: $5.000</div>
+      </div>
+      <div class="qt

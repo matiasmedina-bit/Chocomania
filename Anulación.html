@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chocomanía — B-11 Anulación de pedidos (skeleton)</title>
+<style>
+  :root { --gap:16px; --border:2px; --radius:12px; }
+  * { box-sizing:border-box; } /* BOX MODEL */
+  body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+  /* Encabezado */
+  .header{
+    border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+    display:flex; align-items:center; justify-content:space-between; /* FLEX */
+  }
+  .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+  .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+  .small{ font-size:.85rem; color:#555; }
+
+  /* Secciones / tarjetas */
+  .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+  .card{ border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fafafa; }
+  .title{ font-weight:800; margin-bottom:8px; }
+
+  /* Modal / avisos */
+  .modal{
+    width:min(440px, 92vw); margin:12px 0; padding:16px;
+    border:2px dashed #bdbdbd; border-radius:12px; background:#fff;
+    display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; /* FLEX */
+  }
+
+  /* Formularios */
+  .form{ display:flex; flex-direction:column; gap:10px; } /* FLEX */
+  .form label{ display:flex; flex-direction:column; gap:6px; font-weight:600; } /* FLEX */
+  .form select, .form textarea{
+    padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fafafa;
+  }
+  .row-actions{ display:flex; gap:10px; justify-content:center; } /* FLEX */
+  .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+  .btn.danger{ border-color:#a65; background:#ffecec; }
+  .btn.primary{ border-color:#666; background:#eaeaea; }
+
+  /* Estados */
+  .ok{ color:#2c6b2c; }
+  .warn{ color:#7a2e2e; }
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-11 • Anulación de pedidos</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- ============ Escenario 1: Anulación por el cliente (estado "preparando") ============ -->
+  <section class="section" aria-labelledby="esc1">
+    <h2 id="esc1">Escenario 1 — Anulación por el cliente (preparando)</h2>
+
+    <!-- Estado actual del pedido + acción "Anular compra" -->
+    <div class="card">
+      <div class="title">Pedido Realizado</div>
+      <p>Tu orden <strong>"ORD-2025-001"</strong> está siendo <em>preparada…</em></p>
+      <div class="modal">
+        <form class="form" action="#" method="post">
+          <label>Motivo de anulación
+            <select>
+              <option>Cambio de decisión</option>
+              <option>Error en productos</option>
+              <option>Otro…</option>
+            </select>
+          </label>
+          <label>Detalle (opcional)
+            <textarea rows="3" placeholder="Escribe un detalle breve…"></textarea>
+          </label>
+          <div class="row-actions">
+            <button class="btn danger" type="button">Anular compra</button>
+            <button class="btn" type="button">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resultado: confirmación de anulación -->
+    <div class="modal">
+      <strong class="ok">Confirmar Anulación</strong>
+      <p>Tu pedido ha sido cancelado.</p>
+      <button class="btn primary" type="button">Aceptar anulación</button>
+    </div>
+  </section>
+
+  <!-- ============ Escenario 2: Anulación por administrador (fuera de ventana del cliente) ============ -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Escenario 2 — Anulación por administrador (pedido “recibido”)</h2>
+    <div class="modal">
+      <strong>Pedido Cancelado</strong>
+      <p>Tu orden <strong>"ORD-2025-001"</strong> ha sido cancelada por <em>Stock no disponible</em> (acción de administrador).<br>
+      Se registra usuario y fecha para auditoría.</p>
+      <button class="btn primary" type="button">Aceptar</button>
+    </div>
+  </section>
+
+  <!-- ============ Escenario 3: Pedido no anulable por estado (p. ej., “despachado”) ============ -->
+  <section class="section" aria-labelledby="esc3">
+    <h2 id="esc3">Escenario 3 — Pedido no anulable por estado</h2>
+    <div class="modal">
+      <strong class="warn">Error de anulación</strong>
+      <p>Tu pedido se encuentra en reparto / fue despachado.<br>
+         <strong>No es posible anular en este estado.</strong></p>
+      <button class="btn" type="button">Aceptar</button>
+    </div>
+  </section>
+</body>
+</html>

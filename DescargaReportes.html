@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-17 Descarga de reportes (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing:border-box; } /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+    .small{ font-size:.85rem; color:#555; }
+
+    /* Secciones / tarjetas */
+    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+
+    /* Panel de estadísticas (dos columnas) */
+    .stats{
+      display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap);  /* GRID SYSTEM */
+      border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff;
+    }
+    .box{ border:1px dashed #cfcfcf; border-radius:10px; padding:12px; background:#fafafa; }
+    .box h4{ margin:0 0 8px; }
+
+    /* Barra superior con acción de descarga */
+    .bar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; /* FLEX */
+    }
+    .btn, .link-btn{
+      padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; text-decoration:none; color:inherit;
+    }
+
+    /* Modal/confirmación de archivo descargado */
+    .modal{
+      width:min(460px, 92vw); margin:10px auto; padding:16px;
+      border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa;
+      display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; /* FLEX */
+    }
+    .filelink{ text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-17 • Descarga de reportes</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- ========== Escenario 1: Vista de estadísticas + Descargar PDF ========== -->
+  <section class="section" aria-labelledby="esc1">
+    <div class="bar">
+      <h2 id="esc1">Estadísticas Enero 2025</h2>
+      <!-- acción principal del flujo -->
+      <a class="link-btn" href="#">Descargar PDF</a>
+      <!-- (opcional) también podrías añadir: <a class="link-btn" href="#">Descargar Excel</a> -->
+    </div>
+
+    <div class="stats">
+      <div class="box">
+        <h4><b>Productos:</b></h4>
+        <ol>
+          <li>Chocolate Dubai</li>
+          <li>Bombones Surtidos</li>
+          <li>Frutillas con chocolate</li>
+          <li>Chocolate Amargo 70%</li>
+          <li>Chocolate Caliente</li>
+        </ol>
+      </div>
+      <div class="box">
+        <h4><b>Vendidos:</b></h4>
+        <ol>
+          <li>72 pedidos</li>
+          <li>64 pedidos</li>
+          <li>47 pedidos</li>
+          <li>29 pedidos</li>
+          <li>14 pedidos</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Escenario 2: Archivo descargado ==========
+       (solo layout para mostrar nombre estandarizado) -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Archivo Descargado</h2>
+    <div class="modal">
+      <a class="filelink" href="#">Reporte_Ventas_202501.pdf</a>
+      <button class="btn" type="button">Abrir</button>
+    </div>
+  </section>
+</body>
+</html>

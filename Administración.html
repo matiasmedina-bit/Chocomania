@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-05 Stock visible/agotado (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing: border-box; } /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+
+    /* Contenedor principal */
+    .card{ border:var(--border) dashed #9e9e9e; padding:var(--gap); border-radius:var(--radius); background:#fff; }
+
+    /* Controles superiores */
+    .controls{ display:flex; gap:var(--gap); align-items:center; flex-wrap:wrap; margin-bottom:var(--gap); } /* FLEX */
+    .controls input[type="search"], .controls select{
+      padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fafafa;
+    }
+    .icon-btn{ padding:8px 12px; border:1px solid #888; border-radius:10px; background:#eee; }
+
+    /* GRID de productos */
+    .grid-products{
+      display:grid; gap:var(--gap);
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));   /* GRID SYSTEM */
+    }
+
+    /* Tarjeta de producto */
+    .p-card{
+      position:relative;
+      border:1px dashed #bdbdbd; border-radius:10px; padding:12px; min-height:120px; /* BOX MODEL */
+      display:flex; flex-direction:column; gap:8px; align-items:flex-start;           /* FLEX */
+      background:#fff;
+    }
+    .p-thumb{ width:100%; height:80px; border:1px dashed #ddd; border-radius:8px; }
+    .p-name{ font-weight:600; }
+    .p-price{ font-size:.95rem; color:#444; }
+
+    /* Estado: AGOTADO (solo visual) */
+    .p-card.agotado { opacity:.85; }
+    .p-card.agotado::after{
+      content:"AGOTADO";
+      position:absolute; top:10px; right:-30px;
+      transform:rotate(20deg);
+      padding:6px 14px;
+      border:1px dashed #b44;
+      background:#f3d0d0;
+      border-radius:8px;
+      font-weight:700; font-size:.8rem; color:#622;
+    }
+
+    .small{ font-size:.85rem; color:#555; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-05 • Administración/stock</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- Esc 1: catálogo con productos disponibles -->
+  <section class="card" aria-labelledby="esc1">
+    <h2 id="esc1">Escenario 1 — Catálogo con stock disponible</h2>
+    <div class="controls">
+      <input type="search" placeholder="Buscar producto" />
+      <select aria-label="Categorías">
+        <option>Categorías</option>
+        <option>Chocolates</option><option>Bombones</option><option>Trufas</option><option>Brownies</option>
+      </select>
+      <button class="icon-btn" type="button">🛒</button>
+    </div>
+
+    <div class="grid-products">
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate barra</div>
+        <div class="p-price">$3.000</div>
+      </div>
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Bombones surtidos</div>
+        <div class="p-price">$4.500</div>
+      </div>
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Trufa de cacao</div>
+        <div class="p-price">$2.500</div>
+      </div>
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate con almendras</div>
+        <div class="p-price">$3.500</div>
+      </div>
+      <!-- …más ítems de ejemplo -->
+    </div>
+    <p class="small">Regla: con stock → visible como disponible en el catálogo público.</p>
+  </section>
+
+  <!-- Esc 2: algunos productos marcados “Agotado” -->
+  <section class="card" style="margin-top:16px" aria-labelledby="esc2">
+    <h2 id="esc2">Escenario 2 — Mostrar producto sin stock</h2>
+    <div class="grid-products">
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate clásico</div>
+        <div class="p-price">$3.000</div>
+      </div>
+      <div class="p-card agotado">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate barra sin azúcar</div>
+        <div class="p-price">$4.000</div>
+      </div>
+      <div class="p-card">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate caliente</div>
+        <div class="p-price">$3.500</div>
+      </div>
+      <div class="p-card agotado">
+        <div class="p-thumb"></div>
+        <div class="p-name">Chocolate 70%</div>
+        <div class="p-price">$4.500</div>
+      </div>
+      <div class="p-card agotado">
+        <div class="p-thumb"></div>
+        <div class="p-name">Trufa clásica</div>
+        <div class="p-price">$2.000</div>
+      </div>
+      <!-- …marca “agotado” en los que quieras -->
+    </div>
+    <p class="small">Regla: sin stock y marcado “Agotado” → se muestra con cinta AGOTADO en la grilla pública.</p>
+  </section>
+</body>
+</html>

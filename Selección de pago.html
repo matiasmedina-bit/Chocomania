@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chocomanía — B-09 Métodos de pago (skeleton)</title>
+<style>
+  :root { --gap:16px; --border:2px; --radius:12px; }
+  * { box-sizing: border-box; }                              /* BOX MODEL */
+  body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+
+  /* Header */
+  .header{
+    border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+    display:flex; align-items:center; justify-content:space-between;    /* FLEX */
+  }
+  .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }    /* FLEX */
+  .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+  .small{ font-size:.85rem; color:#555; }
+
+  /* Cards / secciones */
+  .card{ border:var(--border) dashed #9e9e9e; padding:var(--gap); border-radius:var(--radius); background:#fff; }
+  .section{ composes: card; margin-bottom:var(--gap); }
+
+  /* ====== Carrito resumen (antes de pagar) ====== */
+  .cart-line{
+    display:grid; grid-template-columns: 100px 1fr 120px 160px; gap:var(--gap); align-items:start;   /* GRID */
+    padding:12px; border:1px dashed #cfcfcf; border-radius:10px; background:#fff;                    /* BOX */
+  }
+  @media (max-width: 960px){ .cart-line{ grid-template-columns: 90px 1fr; } }
+  .thumb{ width:100%; height:80px; border:1px dashed #ccc; border-radius:10px; background:#fafafa; }
+  .info{ display:flex; flex-direction:column; gap:4px; }                                             /* FLEX */
+  .qty{ border:1px dashed #bbb; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .qty .box{ display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px dashed #ccc; border-radius:10px; padding:6px 10px; }
+  .badge{ display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border:1px dashed #7aa97a; color:#2c6b2c; background:#f0f8f0; border-radius:999px; font-size:.85rem; } /* FLEX */
+  .totals{ display:flex; justify-content:flex-end; gap:16px; font-weight:800; }                      /* FLEX */
+  .cta{ display:flex; justify-content:flex-end; margin-top:10px; }                                   /* FLEX */
+  .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+
+  /* ====== Pantalla de pago ====== */
+  .pay-wrap{ display:grid; grid-template-columns: 1fr; gap:var(--gap); }                             /* GRID */
+  .pay-title{ font-size:1.25rem; font-weight:800; margin:0 0 8px; }
+  .pay-grid{ display:grid; grid-template-columns: 1fr; gap:10px; }                                   /* GRID */
+  .pay-option{
+    display:flex; align-items:center; justify-content:center; gap:12px; padding:12px;                 /* FLEX */
+    border:1px dashed #bbb; border-radius:12px; background:#fafafa; cursor:default;
+  }
+  .pay-option.active{ background:#eaf2ff; border-color:#7aa3ff; }
+  .amount{ text-align:center; font-weight:800; margin-top:10px; }
+
+  /* Cuotas (solo para crédito) */
+  .installments{
+    border:1px dashed #bbb; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;  /* FLEX */
+  }
+  .radio-list{ display:flex; flex-direction:column; gap:6px; }                                             /* FLEX */
+
+  /* Modal/Rechazo */
+  .modal{
+    border:2px dashed #c77; background:#fff8f8; border-radius:12px; padding:16px; width:min(420px, 92vw);
+  }
+  .modal h3{ margin:0 0 8px; }
+  .modal .actions{ display:flex; justify-content:center; margin-top:10px; }                             /* FLEX */
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-09 • Métodos de pago</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <!-- ================= Escenario 1: Selección de pago con Débito ================= -->
+  <section class="section">
+    <h2>Escenario 1 — Confirmo pago con Débito</h2>
+
+    <!-- Resumen del carrito con disponibilidad OK -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="cart-line">
+        <div class="thumb"></div>
+        <div class="info">
+          <div><span class="badge">✔ Stock disponible</span></div>
+          <div><strong>Producto:</strong> Chocolate Dubai</div>
+          <div><strong>Precio producto:</strong> $5.000</div>
+        </div>
+        <div class="qty"><div class="box"><span>−</span><strong>1</strong><span>＋</span></div></div>
+        <div class="totals">TOTAL: $9.500</div>
+      </div>
+
+      <div class="cart-line" style="margin-top:10px;">
+        <div class="thumb"></div>
+        <div class="info">
+          <div><span class="badge">✔ Stock disponible</span></div>
+          <div><strong>Producto:</strong> Bombones Surtidos</div>
+          <div><strong>Precio producto:</strong> $4.500</div>
+        </div>
+        <div class="qty"><div class="box"><span>−</span><strong>1</strong><span>＋</span></div></div>
+        <div></div>
+      </div>
+
+      <div class="cta"><button class="btn" type="button">Finalizar y Comprar</button></div>
+    </div>
+
+    <!-- Pantalla de selección de método (Débito seleccionado) -->
+    <div class="card pay-wrap">
+      <h3 class="pay-title">Selecciona tu método de pago</h3>
+      <div class="pay-grid">
+        <div class="pay-option active">Débito</div>
+        <div class="pay-option">Crédito</div>
+        <div class="pay-option">Efectivo</div>
+      </div>
+      <div class="amount">MONTO TOTAL: $9.500</div>
+    </div>
+  </section>
+
+  <!-- ================= Escenario 2: Cambio a Crédito (con cuotas) ================= -->
+  <section class="section">
+    <h2>Escenario 2 — Cambio de método a Crédito</h2>
+
+    <div class="card pay-wrap">
+      <h3 class="pay-title">Selecciona tu método de pago</h3>
+      <div class="pay-grid">
+        <div class="pay-option">Débito</div>
+        <div class="pay-option active">Crédito</div>
+        <div class="pay-option">Efectivo</div>
+      </div>
+
+      <!-- Cuotas visibles solo en crédito -->
+      <div class="installments">
+        <strong>Cuotas</strong>
+        <div class="radio-list">
+          <label><input type="radio" name="cuotas" /> sin cuotas</label>
+          <label><input type="radio" name="cuotas" /> 3 cuotas</label>
+          <label><input type="radio" name="cuotas" checked /> 6 cuotas</label>
+          <label><input type="radio" name="cuotas" /> 12 cuotas</label>
+        </div>
+      </div>
+
+      <div class="amount">MONTO TOTAL: $9.500</div>
+    </div>
+  </section>
+
+  <!-- ================= Escenario 3: Pago rechazado (modal informativa) ================= -->
+  <section class="section">
+    <h2>Escenario 3 — Pago rechazado</h2>
+    <div class="modal">
+      <h3>Pago rechazado</h3>
+      <p>"Su pago ha sido rechazado, inténtelo nuevamente".</p>
+      <div class="actions"><button class="btn" type="button">Aceptar</button></div>
+    </div>
+  </section>
+</body>
+</html>

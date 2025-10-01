@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chocomanía — B-02 Inicio de sesión (skeleton)</title>
+  <style>
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing: border-box; }                         /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui,Segoe UI,Roboto,sans-serif; background:#f6f7fb; }
+
+    /* Header */
+    .header {
+      border: var(--border) dashed #bdbdbd;               /* BOX MODEL */
+      padding: var(--gap); border-radius: var(--radius); margin-bottom: var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag { font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+
+    /* GRID principal */
+    .layout {
+      display:grid;                                       /* GRID SYSTEM */
+      grid-template-columns: 1.1fr .9fr;
+      gap: var(--gap);
+    }
+    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+    /* Card reutilizable */
+    .card { border: var(--border) dashed #9e9e9e; padding: var(--gap); border-radius: var(--radius); background:#fff; }
+
+    /* Formulario (FLEX) */
+    .form { display:flex; flex-direction:column; gap:12px; }          /* FLEX */
+    .input { display:flex; flex-direction:column; gap:6px; }          /* FLEX */
+    .input input { padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fafafa; }
+    .actions { display:flex; gap:10px; align-items:center; }          /* FLEX */
+    .link { font-size:.9rem; text-decoration:underline; color:#666; }
+
+    /* Estados (GRID interno) */
+    .grid-estados { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); } /* GRID */
+
+    /* API caja decorativa */
+    .api { border-color:#c9a; background:#fff8f5; }
+
+    .small { font-size:.85rem; color:#555; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-02 • Inicio de sesión</span>
+      <span class="tag">wireframe</span>
+    </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
+  </header>
+
+  <main class="layout">
+    <!-- IZQUIERDA: formulario de inicio -->
+    <section class="card">
+      <h2>Inicio de sesión</h2>
+      <form class="form" action="#" method="post">
+        <label class="input">Correo
+          <input type="email" placeholder="luis@example.com" />
+        </label>
+        <label class="input">Contraseña
+          <input type="password" placeholder="********" />
+        </label>
+        <div class="actions">
+          <button type="button">Iniciar sesión</button>
+          <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+      </form>
+      <p class="small">Esc 1 → llamada a API/InicioSesión (referencia).</p>
+    </section>
+
+    <!-- DERECHA: panel de estados/mensajes -->
+    <aside class="card">
+      <h2>Estados &amp; alertas</h2>
+      <div class="grid-estados">
+        <!-- Esc 2: alerta de seguridad por 2 intentos fallidos -->
+        <div class="card">
+          <h3>Alerta de seguridad</h3>
+          <p>"Tienes 2 intentos fallidos. Si fallas de nuevo se bloqueará temporalmente tu cuenta".</p>
+          <div class="actions"><button type="button">Aceptar</button></div>
+        </div>
+        <!-- Esc 3: bloqueo temporal (20 min) -->
+        <div class="card">
+          <h3>Bloqueo temporal</h3>
+          <p>"Su cuenta ha sido bloqueada temporalmente por 20 minutos".</p>
+          <div class="actions"><button type="button">Aceptar</button></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Caja opcional para la “API/InicioSesión” del diagrama (decorativa) -->
+  <section class="card api" style="margin-top:16px">
+    <h3>API/InicioSesión (esquema)</h3>
+    <ul>
+      <li>Entrada: correo, contraseña</li>
+      <li>Salida: <code>response</code></li>
+    </ul>
+    <!-- Esc 1 -->
+  </section>
+</body>
+</html>
