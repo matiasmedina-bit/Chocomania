@@ -3,95 +3,374 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chocomanía — B-12 Orden de despacho (skeleton)</title>
+  <title>Chocomanía · B-12 Orden de despacho</title>
+  <meta name="description" content="Generación automática de orden de despacho, asignación de repartidor, progreso de envío y registro histórico.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --gap:16px; --border:2px; --radius:12px; }
-    * { box-sizing: border-box; }                                 /* BOX MODEL */
-    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+    :root{
+      --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08);
+      --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; --accent:#a66cc4;
+      --ok:#0d7a55; --warn:#92400e; --err:#991b1b; --info:#1d4ed8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1140px; margin:0 auto; padding:20px}
 
-    /* Header */
-    .header{
-      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
-      display:flex; align-items:center; justify-content:space-between; /* FLEX */
-    }
-    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
-    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
-    .small{ font-size:.85rem; color:#555; }
+    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px); background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem}
+    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+    nav ul{display:flex; gap:14px; list-style:none; margin:0; padding:0}
+    nav a{padding:8px 12px; border-radius:999px}
+    nav a:hover{background:#ece7f6}
+    .btn{border:1px solid var(--border); background:#fff; border-radius:999px; padding:10px 14px; cursor:pointer}
+    .btn[disabled]{opacity:.5; cursor:not-allowed}
+    .btn.primary{background:var(--brand); color:#fff; border-color:transparent}
+    .btn.small{padding:8px 12px}
 
-    /* Secciones / tarjetas */
-    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
-    .modal{
-      width:min(440px, 92vw); margin:10px auto; padding:16px;
-      border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa;
-      display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; /* FLEX */
-    }
-    .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
+    .muted{color:var(--muted)}
 
-    /* Detalle de orden (asignación) */
-    .order{
-      border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff;
-      display:grid; gap:10px;                          /* GRID SYSTEM */
-    }
-    .order h3{ margin:0; }
-    .kv{ display:grid; grid-template-columns: 160px 1fr; gap:8px; } /* GRID */
-    .kv div{ padding:6px 10px; border:1px dashed #ddd; border-radius:8px; background:#fafafa; }
+    .modal{width:min(520px, 92vw); margin:10px auto; padding:16px; border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center}
 
-    /* Historial de despachos */
-    .history{
-      display:grid; gap:10px;                          /* GRID SYSTEM */
-      border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff;
-    }
-    .item{
-      display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center;  /* GRID */
-      border:1px dashed #ddd; border-radius:10px; padding:10px; background:#fafafa;
-      font-weight:700;
-    }
-    .ok{ color:#2c6b2c; } .bad{ color:#7a2e2e; }
+    .order{border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff; display:grid; gap:12px}
+    .order h3{margin:0}
+    .kv{display:grid; grid-template-columns: 160px 1fr; gap:8px}
+    .kv div{padding:6px 10px; border:1px dashed #ddd; border-radius:8px; background:#fafafa}
+
+    .tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px dashed}
+    .pill.ok{border-color:#7aa97a; background:#f0f8f0; color:#2c6b2c}
+    .pill.warn{border-color:#f5c2a8; background:#fff6ef; color:#92400e}
+    .pill.info{border-color:#a6c0ff; background:#eef4ff; color:#1e40af}
+    .pill.err{border-color:#e19a9a; background:#fde9e9; color:#7a2e2e}
+
+    /* progreso por etapas */
+    .steps{display:grid; grid-template-columns: repeat(4,1fr); gap:8px; width:100%; max-width:560px}
+    .step{height:8px; background:#eef2ff; border-radius:999px; overflow:hidden}
+    .step > span{display:block; height:100%; background:linear-gradient(90deg,#7d3c98,#aa6bc8); width:0%}
+
+    /* Historial */
+    .history{display:grid; gap:10px; border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fff}
+    .item{display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center; border:1px dashed #ddd; border-radius:10px; padding:10px; background:#fafafa; font-weight:700; cursor:pointer}
+    .item:hover{background:#f6f6ff}
+    .ok{color:#0d7a55} .bad{color:#991b1b}
+
+    .tabs{display:flex; gap:6px; flex-wrap:wrap}
+    .tab{border:1px solid var(--border); padding:6px 10px; border-radius:999px; cursor:pointer}
+    .tab.active{background:#ece7f6; border-color:#d9c8f0}
+
+    /* Toast */
+    .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
+    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
+    .toast.show{opacity:1; transform:translateY(0)}
+
+    /* Bitácora */
+    .log{display:grid; gap:6px; font-size:.9rem}
+    .log div{padding:6px 10px; border:1px dashed #e5e7eb; border-radius:8px; background:#fafafa}
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="row">
-      <strong>Chocomanía</strong>
-      <span class="tag">B-12 • Orden de despacho</span>
-      <span class="tag">wireframe</span>
+  <header class="top">
+    <div class="container topbar">
+      <div class="brand"><div class="logo" aria-hidden="true"></div> Chocomanía</div>
+      <nav aria-label="principal">
+        <ul>
+          <li><a href="#esc1">Generar</a></li>
+          <li><a href="#esc2">Asignar</a></li>
+          <li><a href="#esc3">Historial</a></li>
+        </ul>
+      </nav>
+      <div class="tools">
+        <button class="btn small" id="seedDemo" type="button">Sembrar historial</button>
+        <button class="btn small" id="resetDemo" type="button">Reiniciar</button>
+        <button class="btn primary" id="quickGen" type="button">Generar orden</button>
+      </div>
     </div>
-    <div class="small">HTML5 + Grid + Flex + Box Model</div>
   </header>
 
-  <!-- Esc 1: generación automática al confirmar pedido -->
-  <section class="section" aria-labelledby="esc1">
-    <h2 id="esc1">Escenario 1 — Generación automática</h2>
-    <div class="modal">
-      <strong>Orden despacho</strong>
-      <p><b>ORD-2025-120</b><br>generando datos…</p>
-      <button class="btn" type="button">Aceptar</button>
-    </div>
-  </section>
-
-  <!-- Esc 2: asignación de repartidor (dirección, productos, repartidor) -->
-  <section class="section" aria-labelledby="esc2">
-    <h2 id="esc2">Escenario 2 — Asignación de repartidor</h2>
-    <div class="order">
-      <h3>Orden despacho</h3>
-      <div class="kv">
-        <div>Dirección</div><div>ictinos 201 — Comuna Centro</div>
-        <div>Productos</div><div>chocolate dubai; bombones surtidos</div>
-        <div>Repartidor</div><div>Jhon Jairo</div>
+  <main class="container">
+    <!-- Escenario 1 -->
+    <section class="section" aria-labelledby="esc1">
+      <h2 id="esc1">Generación automática</h2>
+      <div class="modal" id="genBox">
+        <strong>Orden de despacho</strong>
+        <p><b id="genId">—</b><br><span id="genMsg">Listo para generar</span></p>
+        <div class="tools">
+          <button class="btn" id="genBtn" type="button">Generar ahora</button>
+          <button class="btn" id="genOk" type="button">Aceptar</button>
+        </div>
+        <div class="steps">
+          <div class="step"><span id="st1"></span></div>
+          <div class="step"><span id="st2"></span></div>
+          <div class="step"><span id="st3"></span></div>
+          <div class="step"><span id="st4"></span></div>
+        </div>
       </div>
-      <div style="text-align:center;"><button class="btn" type="button">Aceptar</button></div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Esc 3: registro en historial de bodega -->
-  <section class="section" aria-labelledby="esc3">
-    <h2 id="esc3">Escenario 3 — Historial de despachos</h2>
-    <div class="history">
-      <div class="item"><span>ORD-2025-120:</span> <span class="ok">ENTREGADO</span></div>
-      <div class="item"><span>ORD-2025-119:</span> <span class="ok">ENTREGADO</span></div>
-      <div class="item"><span>ORD-2025-118:</span> <span class="bad">CANCELADO</span></div>
-      <div class="item"><span>ORD-2025-117:</span> <span class="ok">ENTREGADO</span></div>
-    </div>
-  </section>
+    <!-- Escenario 2 -->
+    <section class="section" aria-labelledby="esc2">
+      <h2 id="esc2">Asignación de repartidor</h2>
+      <article class="order">
+        <h3 style="display:flex; justify-content:space-between; align-items:center">
+          Orden <span id="h3Id">—</span>
+          <span class="pill info" id="statusPill">generando</span>
+        </h3>
+        <div class="kv">
+          <div>Dirección</div><div id="vAddress">—</div>
+          <div>Productos</div><div id="vProducts">—</div>
+          <div>Repartidor</div><div id="vDriver">—</div>
+          <div>ETA</div><div id="vEta">— <span class="muted" id="etaCountdown"></span></div>
+        </div>
+
+        <div class="tools">
+          <label>Repartidor
+            <select id="driverSel" style="padding:8px 10px; border:1px solid #ccc; border-radius:8px">
+              <option>Jhon Jairo</option>
+              <option>María Silva</option>
+              <option>Pedro Gómez</option>
+            </select>
+          </label>
+          <label>ETA
+            <input id="etaInp" type="time" value="14:30" style="padding:8px 10px; border:1px solid #ccc; border-radius:8px">
+          </label>
+          <button class="btn" id="assignBtn" type="button">Asignar repartidor</button>
+          <button class="btn" id="enRutaBtn" type="button" disabled>Marcar en ruta</button>
+          <button class="btn primary" id="entregadoBtn" type="button" disabled>Marcar entregado</button>
+          <button class="btn" id="cancelBtn" type="button">Cancelar</button>
+        </div>
+
+        <div class="log" id="logBox" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <!-- Escenario 3 -->
+    <section class="section" aria-labelledby="esc3">
+      <h2 id="esc3">Historial de despachos</h2>
+      <div class="tools" style="justify-content:space-between; flex-wrap:wrap">
+        <div class="tabs">
+          <button class="tab active" data-filter="all">Todos</button>
+          <button class="tab" data-filter="ok">Entregados</button>
+          <button class="tab" data-filter="bad">Cancelados</button>
+          <button class="tab" data-filter="en-ruta">En ruta</button>
+          <button class="tab" data-filter="asignado">Asignados</button>
+        </div>
+        <button class="btn small" id="clearHistory" type="button">Limpiar historial</button>
+      </div>
+      <div class="history" id="historyList"></div>
+    </section>
+  </main>
+
+  <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
+  <footer class="container" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Orden de despacho</footer>
+
+  <script>
+    // ===== Utilidades =====
+    const $ = (s)=> document.querySelector(s);
+    const $$ = (s)=> document.querySelectorAll(s);
+    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.querySelector('.toast-wrap').appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),200); }, 2200); }
+    const pad=(n)=>String(n).padStart(2,'0');
+    function nowISO(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+    function minutesLeft(targetHHMM){
+      if(!targetHHMM) return null;
+      const [h,m]=targetHHMM.split(':').map(x=>+x);
+      const now=new Date(); const tgt=new Date(now); tgt.setHours(h,m,0,0);
+      return Math.max(0, Math.floor((tgt-now)/1000));
+    }
+    function fmtCountdown(sec){
+      if(sec==null) return '';
+      const m=Math.floor(sec/60), s=sec%60;
+      return `(${pad(m)}:${pad(s)})`;
+    }
+
+    // ===== Storage =====
+    const LS_DISP='choco_dispatch_orders', LS_DISP_SEQ='choco_dispatch_seq', LS_ACTIVE='choco_dispatch_active';
+    const DEFAULT_ADDR='Ictinos 201 — Comuna Centro';
+
+    const getAll = ()=> JSON.parse(localStorage.getItem(LS_DISP)||'[]');
+    const setAll = (arr)=> localStorage.setItem(LS_DISP, JSON.stringify(arr));
+    const getActiveId = ()=> new URLSearchParams(location.search).get('order') || localStorage.getItem(LS_ACTIVE) || '';
+    const setActiveId = (id)=>{ localStorage.setItem(LS_ACTIVE,id); history.replaceState(null,'',`?order=${id}`); loadDetail(id); markActiveRow(); };
+
+    function nextId(){
+      const y=new Date().getFullYear();
+      let n=parseInt(localStorage.getItem(LS_DISP_SEQ)||'122',10)+1;
+      localStorage.setItem(LS_DISP_SEQ, String(n));
+      return `ORD-${y}-${String(n).padStart(3,'0')}`;
+    }
+
+    // ===== Estado en memoria =====
+    let current=null;
+    let etaTimer=null;
+
+    // ===== Progreso por etapas visual =====
+    function setSteps(p){ $('#st1').style.width = p>=1?'100%':'0%'; $('#st2').style.width = p>=2?'100%':'0%'; $('#st3').style.width = p>=3?'100%':'0%'; $('#st4').style.width = p>=4?'100%':'0%'; }
+
+    // ===== Badges Estado =====
+    function setStatus(st){
+      if(!current) return;
+      current.status = st;
+      current.logs.push({at:nowISO(), evt:st});
+      upsert(current);
+
+      const pill = $('#statusPill');
+      const map = { 'generando':['info','generando',1], 'asignado':['ok','asignado',2], 'en ruta':['warn','en ruta',3], 'entregado':['ok','entregado',4], 'cancelado':['err','cancelado',4] };
+      const [cls,label,step]=map[st]||['info',st,1];
+      pill.className='pill '+cls; pill.textContent=label; setSteps(step);
+
+      $('#enRutaBtn').disabled = !(st==='asignado');
+      $('#entregadoBtn').disabled = !(st==='en ruta');
+
+      renderLog();
+    }
+
+    // ===== CRUD local =====
+    function upsert(o){
+      const arr=getAll(); const i=arr.findIndex(x=>x.id===o.id);
+      if(i>=0) arr[i]=o; else arr.unshift(o);
+      setAll(arr); renderHistory(); markActiveRow();
+    }
+
+    // ===== Historial =====
+    function statusClass(s){ return s==='cancelado'?'bad':(s==='entregado'?'ok':''); }
+    function renderHistory(filter='all'){
+      const box=$('#historyList'); box.innerHTML='';
+      const arr=getAll();
+      const pass=o=>{
+        if(filter==='ok') return o.status==='entregado';
+        if(filter==='bad') return o.status==='cancelado';
+        if(filter==='en-ruta') return o.status==='en ruta';
+        if(filter==='asignado') return o.status==='asignado';
+        return true;
+      };
+      arr.filter(pass).forEach(o=>{
+        const row=document.createElement('div'); row.className='item'; row.dataset.id=o.id;
+        row.innerHTML=`<span>${o.id}: <span class="muted">${o.address}</span></span> <span class="${statusClass(o.status)}">${o.status.toUpperCase()}</span>`;
+        row.addEventListener('click', ()=>{ setActiveId(o.id); toast('Cargado '+o.id); window.location.hash='#esc2'; });
+        box.appendChild(row);
+      });
+      if(!box.children.length) box.innerHTML='<div class="muted">No hay registros.</div>';
+    }
+    function markActiveRow(){
+      const id=getActiveId(); $$('#historyList .item').forEach(el=> el.style.outline = (el.dataset.id===id)?'2px solid #c7a6ea':'none');
+    }
+
+    // ===== Detalle =====
+    function loadDetail(id){
+      const arr=getAll(); current = arr.find(x=>x.id===id) || null;
+      if(!current){ $('#h3Id').textContent='—'; $('#vAddress').textContent='—'; $('#vProducts').textContent='—'; $('#vDriver').textContent='—'; $('#vEta').textContent='—'; $('#etaCountdown').textContent=''; setSteps(0); return; }
+      $('#h3Id').textContent=current.id;
+      $('#vAddress').textContent=current.address;
+      $('#vProducts').textContent=current.products;
+      $('#vDriver').textContent=current.driver || '—';
+      $('#vEta').firstChild.nodeValue = (current.eta||'—')+' ';
+      setStatus(current.status);
+      renderLog();
+      startEtaCountdown();
+    }
+
+    function renderLog(){
+      const box=$('#logBox'); box.innerHTML='<strong>Bitácora</strong>';
+      current.logs.slice().reverse().forEach(l=>{
+        const div=document.createElement('div'); div.textContent = `${l.at} – ${l.evt}`;
+        box.appendChild(div);
+      });
+    }
+
+    function startEtaCountdown(){
+      clearInterval(etaTimer);
+      function tick(){
+        if(!current || !current.eta || current.status==='entregado' || current.status==='cancelado'){ $('#etaCountdown').textContent=''; return clearInterval(etaTimer); }
+        const sec = minutesLeft(current.eta); $('#etaCountdown').textContent = sec? fmtCountdown(sec) : '(00:00)';
+      }
+      tick(); etaTimer=setInterval(tick, 1000);
+    }
+
+    // ===== Generación =====
+    function productsFromCart(){
+      try{
+        const cart = JSON.parse(localStorage.getItem('choco_cart')||'{}');
+        const map = { p21:'Chocolate Dubai', p02:'Bombones surtidos', p03:'Trufa de cacao', p04:'Caja trufas 12u' };
+        const names = Object.keys(cart).filter(k=>cart[k]>0).map(k=>`${cart[k]}x ${(map[k]||'Producto')}`);
+        return names.length? names.join('; ') : '1x Chocolate Dubai; 1x Bombones surtidos';
+      }catch{ return '1x Chocolate Dubai; 1x Bombones surtidos'; }
+    }
+
+    function generateOrder(){
+      const id = nextId();
+      const o = { id, date: nowISO(), address: DEFAULT_ADDR, products: productsFromCart(), status:'generando', driver:null, eta:null, logs: [{at:nowISO(), evt:'generada'}] };
+      upsert(o); setActiveId(id);
+      $('#genId').textContent = id; $('#genMsg').textContent = 'Generando datos…';
+      setSteps(1);
+      // animación breve
+      let p=0; const parts=[$('#st1'),$('#st2'),$('#st3'),$('#st4')];
+      const it=setInterval(()=>{ parts[Math.min(3,Math.floor(p/25))].style.width='100%'; p+=12.5; if(p>=100){ clearInterval(it); $('#genMsg').textContent='¡Orden lista!'; toast('Orden creada '+id); } }, 160);
+    }
+
+    // ===== Acciones =====
+    $('#genBtn').addEventListener('click', generateOrder);
+    $('#quickGen').addEventListener('click', ()=>{ generateOrder(); window.location.hash='#esc2'; });
+    $('#genOk').addEventListener('click', ()=> toast('OK'));
+
+    $('#assignBtn').addEventListener('click', ()=>{
+      if(!current){ toast('Primero genera la orden'); return; }
+      current.driver = $('#driverSel').value;
+      current.eta = $('#etaInp').value;
+      setStatus('asignado'); startEtaCountdown(); upsert(current);
+      toast('Repartidor asignado');
+    });
+
+    $('#enRutaBtn').addEventListener('click', ()=>{ if(!current) return; setStatus('en ruta'); toast('Pedido en ruta'); });
+    $('#entregadoBtn').addEventListener('click', ()=>{ if(!current) return; setStatus('entregado'); toast('Pedido entregado ✓'); });
+    $('#cancelBtn').addEventListener('click', ()=>{
+      if(!current) return;
+      if(current.status==='entregado') return toast('No puedes cancelar una orden entregada');
+      setStatus('cancelado'); toast('Pedido cancelado');
+    });
+
+    // filtros
+    $$('.tab').forEach(b=> b.addEventListener('click', ()=>{
+      $$('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+      renderHistory(b.dataset.filter);
+    }));
+
+    $('#clearHistory').addEventListener('click', ()=>{ localStorage.removeItem(LS_DISP); renderHistory(); toast('Historial limpiado'); });
+
+    // Demo
+    function seedDemo(overwrite=false){
+      if(!overwrite && getAll().length) return;
+      const y=new Date().getFullYear();
+      const demo=[
+        {id:`ORD-${y}-122`, date:nowISO(), address:DEFAULT_ADDR, products:'1x Bombones surtidos; 1x Chocolate Dubai', status:'generando', driver:null, eta:null, logs:[{at:nowISO(),evt:'generada'}]},
+        {id:`ORD-${y}-121`, date:nowISO(), address:DEFAULT_ADDR, products:'1x Bombones surtidos', status:'generando', driver:null, eta:null, logs:[{at:nowISO(),evt:'generada'}]},
+        {id:`ORD-${y}-118`, date:nowISO(), address:'San Diego 101 — Centro', products:'1x Chocolate 70%', status:'cancelado', driver:null, eta:null, logs:[{at:nowISO(),evt:'generada'},{at:nowISO(),evt:'cancelado'}]},
+        {id:`ORD-${y}-117`, date:nowISO(), address:'Portugal 330 — Oriente', products:'1x Brownies x6', status:'entregado', driver:'Pedro Gómez', eta:'16:00', logs:[{at:nowISO(),evt:'generada'},{at:nowISO(),evt:'asignado'},{at:nowISO(),evt:'en ruta'},{at:nowISO(),evt:'entregado'}]}
+      ];
+      setAll(demo); localStorage.setItem(LS_DISP_SEQ,'122');
+      renderHistory(); setActiveId(`ORD-${y}-122`);
+    }
+
+    $('#seedDemo').addEventListener('click', ()=>{ seedDemo(true); toast('Historial demo cargado'); });
+    $('#resetDemo').addEventListener('click', ()=>{ localStorage.removeItem(LS_DISP); localStorage.removeItem(LS_DISP_SEQ); localStorage.removeItem(LS_ACTIVE); renderHistory(); loadDetail(''); toast('Reiniciado'); });
+
+    function initFromQuery(){
+      const q = new URLSearchParams(location.search).get('order');
+      if(q && getAll().some(o=>o.id===q)){ setActiveId(q); }
+    }
+
+    // Init
+    seedDemo(false);
+    renderHistory();
+    initFromQuery();
+    loadDetail(getActiveId());
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

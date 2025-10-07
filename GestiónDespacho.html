@@ -3,87 +3,338 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chocomanía — B-14 Gestión de despacho (skeleton)</title>
+  <title>Chocomanía · B-14 Gestión de despacho</title>
+  <meta name="description" content="Despacho a domicilio, retiro en tienda con código y reprogramación de entrega con bitácora y sincronización con despacho.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --gap:16px; --border:2px; --radius:12px; }
-    * { box-sizing: border-box; } /* BOX MODEL */
-    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+    :root{ --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08); --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; --ok:#0d7a55; --warn:#b45309; --err:#991b1b; --chip:#eef2ff; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1140px; margin:0 auto; padding:20px}
 
-    /* Header */
-    .header{
-      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
-      display:flex; align-items:center; justify-content:space-between; /* FLEX */
-    }
-    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
-    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
-    .small{ font-size:.85rem; color:#555; }
+    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px); background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem}
+    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
 
-    /* Secciones */
-    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
+    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
+    .muted{color:var(--muted)} .mini{font-size:.9rem}
+    .btn{border:1px solid var(--border); background:#fff; border-radius:999px; padding:10px 16px; cursor:pointer}
+    .btn[disabled]{opacity:.55; cursor:not-allowed}
+    .btn.primary{background:var(--brand); color:#fff; border-color:transparent}
+    .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 
-    /* Tarjeta/Modal */
-    .modal{
-      width:min(460px,92vw); margin:10px auto; padding:16px;
-      border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa;
-      display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center; /* FLEX */
-    }
-    .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+    .modal{width:min(560px,92vw); margin:10px auto; padding:16px; border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center}
+    .kv{display:grid; grid-template-columns: 140px 1fr; gap:8px; width:100%}
+    .kv div{border:1px dashed #ddd; border-radius:8px; padding:8px 10px; background:#fff}
+    .inp{padding:8px 10px; border:1px solid #d1d5db; border-radius:8px}
 
-    /* Bloques de detalle */
-    .kv{ display:grid; grid-template-columns: 140px 1fr; gap:8px; width:100%; } /* GRID */
-    .kv div{ border:1px dashed #ddd; border-radius:8px; padding:8px 10px; background:#fff; }
-    .time-box{ border:1px dashed #bbb; border-radius:10px; padding:8px 10px; }
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px dashed}
+    .pill.info{border-color:#a6c0ff; background:#eef4ff; color:#1e40af}
+    .pill.ok{border-color:#7aa97a; background:#f0f8f0; color:#2c6b2c}
+    .pill.warn{border-color:#f5c2a8; background:#fff6ef; color:#92400e}
+    .pill.err{border-color:#e19a9a; background:#fde9e9; color:#7a2e2e}
 
+    .log{display:grid; gap:6px; margin-top:8px}
+    .log div{padding:6px 10px; border:1px dashed #e5e7eb; border-radius:8px; background:#fff}
+    .split{display:grid; grid-template-columns: 1fr; gap:12px}
+    @media(min-width:900px){ .split{grid-template-columns: 1fr 1fr} }
+
+    /* Toast */
+    .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
+    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
+    .toast.show{opacity:1; transform:translateY(0)}
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="row">
-      <strong>Chocomanía</strong>
-      <span class="tag">B-14 • Gestión de despacho</span>
-      <span class="tag">wireframe</span>
+  <header class="top">
+    <div class="container topbar">
+      <div class="brand"><div class="logo" aria-hidden="true"></div> Chocomanía</div>
+      <div class="row">
+        <span class="pill info" id="statusPill">sin selección</span>
+        <button class="btn" id="seedDemo" type="button">Usar demo</button>
+        <button class="btn" id="clear" type="button">Limpiar</button>
+      </div>
     </div>
-    <div class="small">HTML5 + Grid + Flex + Box Model</div>
   </header>
 
-  <!-- ============= Escenario 1: Selección de despacho a domicilio ============= -->
-  <section class="section" aria-labelledby="esc1">
-    <h2 id="esc1">Escenario 1 — Despacho a domicilio confirmado</h2>
-    <div class="modal">
-      <strong>Envío</strong>
-      <div class="kv">
-        <div>Pedido</div><div>ORD-2025-125</div>
-        <div>Dirección</div><div>ictinos 201</div>
-        <div>Envío</div><div>$2.500</div>
-        <div>Entrega</div><div>18:35 – 18:50 (estimada)</div>
+  <main class="container split">
+    <!-- Escenario 1: Domicilio -->
+    <section class="section" aria-labelledby="esc1">
+      <h2 id="esc1">Despacho a domicilio confirmado</h2>
+      <div class="modal">
+        <strong>Envío</strong>
+        <div class="kv">
+          <div>Pedido</div><div id="oId1">—</div>
+          <div>Dirección</div><div><input id="addr" class="inp" value="Ictinos 201"></div>
+          <div>Envío</div><div id="fee">$0</div>
+          <div>Entrega</div><div id="etaBox">—</div>
+        </div>
+        <div class="row" style="justify-content:center">
+          <label>Comuna
+            <select id="comuna" class="inp">
+              <option value="centro" selected>Centro ($2.500)</option>
+              <option value="norte">Norte ($3.000)</option>
+              <option value="sur">Sur ($3.500)</option>
+              <option value="oriente">Oriente ($3.000)</option>
+              <option value="poniente">Poniente ($3.000)</option>
+            </select>
+          </label>
+          <label>Ventana
+            <select id="window" class="inp">
+              <option value="15">+15 min</option>
+              <option value="30" selected>+30 min</option>
+              <option value="45">+45 min</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn" id="calc" type="button">Recalcular ETA</button>
+          <button class="btn primary" id="confirmHome" type="button">Aceptar</button>
+        </div>
+        <div class="log" id="log1"></div>
       </div>
-      <button class="btn" type="button">Aceptar</button>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============= Escenario 2: Selección de retiro en tienda ============= -->
-  <section class="section" aria-labelledby="esc2">
-    <h2 id="esc2">Escenario 2 — Retiro en tienda</h2>
-    <div class="modal">
-      <strong>Retiro en tienda</strong>
-      <p>"Te hemos enviado un código a tu correo para retirar el pedido en nuestra tienda".</p>
-      <button class="btn" type="button">Aceptar</button>
-    </div>
-  </section>
-
-  <!-- ============= Escenario 3: Programar entrega (cambio de hora) ============= -->
-  <section class="section" aria-labelledby="esc3">
-    <h2 id="esc3">Escenario 3 — Programar entrega</h2>
-    <div class="modal">
-      <strong>Envío</strong>
-      <div class="kv" style="margin-bottom:8px;">
-        <div>Dirección</div><div>ictinos 201</div>
-        <div>Envío</div><div>$2.500</div>
-        <div>Entrega</div><div>18:35 – 18:50</div>
+    <!-- Escenario 2: Retiro -->
+    <section class="section" aria-labelledby="esc2">
+      <h2 id="esc2">Retiro en tienda</h2>
+      <div class="modal">
+        <strong>Retiro en tienda</strong>
+        <p class="mini">Te enviamos un código para retirar el pedido. Vence en <b>2 horas</b>.</p>
+        <div class="row" style="justify-content:center">
+          <input id="email" type="email" class="inp" placeholder="tu_correo@example.com" style="min-width:260px">
+          <button class="btn" id="sendCode" type="button">Enviar código</button>
+        </div>
+        <div class="kv">
+          <div>Pedido</div><div id="oId2">—</div>
+          <div>Código</div><div id="codeBox" class="pill ok">—</div>
+        </div>
+        <div class="row">
+          <button class="btn" id="copyCode" type="button">Copiar código</button>
+          <button class="btn" id="pasteSim" type="button">Pegar/Scan simulado</button>
+          <button class="btn primary" id="confirmPickup" type="button">Aceptar</button>
+        </div>
+        <div class="log" id="log2"></div>
       </div>
-      <div class="time-box">Modificar hora de entrega a: <b>20:00</b></div>
-      <button class="btn" type="button">Aceptar</button>
-    </div>
-  </section>
+    </section>
+
+    <!-- Escenario 3: Reprogramar -->
+    <section class="section" aria-labelledby="esc3">
+      <h2 id="esc3">Programar entrega</h2>
+      <div class="modal">
+        <strong>Envío</strong>
+        <div class="kv" style="margin-bottom:8px;">
+          <div>Dirección</div><div id="addr3">—</div>
+          <div>Envío</div><div id="fee3">—</div>
+          <div>Entrega</div><div id="eta3">—</div>
+        </div>
+        <div class="row">
+          <label>Modificar hora a
+            <input id="timeNew" type="time" value="20:00" class="inp">
+          </label>
+          <button class="btn primary" id="confirmResched" type="button">Aceptar</button>
+        </div>
+        <div class="log" id="log3"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
+  <footer class="container" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Gestión de despacho</footer>
+
+  <script>
+    // ===== Util =====
+    const $ = s=>document.querySelector(s);
+    const pad=n=>String(n).padStart(2,'0');
+    const toast=(msg)=>{const t=document.createElement('div');t.className='toast';t.textContent=msg;document.querySelector('.toast-wrap').appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),200)},2200)}
+    const currency=n=>n.toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});
+    const nowISO=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+    const qs= new URLSearchParams(location.search);
+    const orderFromQuery = ()=> qs.get('order') || '';
+
+    // ===== Storage / Integración =====
+    const LS_DELIVERY='choco_delivery_pref';         // preferencia elegida (domicilio/retiro)
+    const LS_DELIVERY_LOG='choco_delivery_log';      // bitácora local
+    const LS_DISP='choco_dispatch_orders';           // de B-12
+
+    const FEES={ centro:2500, norte:3000, sur:3500, oriente:3000, poniente:3000 };
+
+    const loadPref = ()=> JSON.parse(localStorage.getItem(LS_DELIVERY)||'null');
+    const savePref = (p)=> localStorage.setItem(LS_DELIVERY, JSON.stringify(p));
+    const pushLog = (txt)=>{ const arr=JSON.parse(localStorage.getItem(LS_DELIVERY_LOG)||'[]'); arr.unshift(`${nowISO()} · ${txt}`); localStorage.setItem(LS_DELIVERY_LOG, JSON.stringify(arr)); renderLogs(); };
+
+    function getDispatchArr(){ return JSON.parse(localStorage.getItem(LS_DISP)||'[]'); }
+    function setDispatchArr(arr){ localStorage.setItem(LS_DISP, JSON.stringify(arr)); }
+
+    function getActiveDispatch(){
+      const arr=getDispatchArr();
+      const qId = orderFromQuery();
+      if(qId){ const m=arr.find(o=>o.id===qId); if(m) return m; }
+      return arr[0] || null;
+    }
+    function upsertDispatch(o){
+      const arr=getDispatchArr(); const i=arr.findIndex(x=>x.id===o.id);
+      if(i>=0) arr[i]=o; else arr.unshift(o);
+      setDispatchArr(arr);
+    }
+
+    // ===== Helpers tiempo/ETA =====
+    function fmtTime(d){ return d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}); }
+    function rangeFromNow(min){ const a=new Date(Date.now()+min*60000), b=new Date(a.getTime()+15*60000); return `${fmtTime(a)} – ${fmtTime(b)}`; }
+    function rangeFromHourMinute(hhmm){ const [h,m]=hhmm.split(':').map(Number); const d=new Date(); d.setHours(h,m,0,0); const b=new Date(d.getTime()+15*60000); return `${fmtTime(d)} – ${fmtTime(b)}`; }
+
+    // ===== Pintado =====
+    function setPill(txt, cls='info'){ const p=$('#statusPill'); p.className='pill '+cls; p.textContent=txt; }
+    function paintIds(){
+      const d=getActiveDispatch(); const id=d?.id || defaultId();
+      $('#oId1').textContent=id; $('#oId2').textContent=id;
+    }
+    function defaultId(){ const y=new Date().getFullYear(); return `ORD-${y}-125`; }
+
+    function paintFromPref(){
+      const p=loadPref(); const d=getActiveDispatch();
+      if(!p){ setPill('sin selección','info'); $('.kv #fee').textContent=currency(FEES['centro']); $('#etaBox').textContent=rangeFromNow(30); $('#addr3').textContent=$('#addr').value||'Ictinos 201'; $('#fee3').textContent=currency(FEES['centro']); $('#eta3').textContent=$('#etaBox').textContent; return; }
+      if(p.method==='domicilio'){
+        setPill(`domicilio · ${p.eta} · ${currency(p.fee)}`,'ok');
+        $('#addr').value=p.address; $('#fee').textContent=currency(p.fee); $('#etaBox').textContent=p.eta;
+        $('#addr3').textContent=p.address; $('#fee3').textContent=currency(p.fee); $('#eta3').textContent=p.eta;
+      }
+      if(p.method==='retiro'){
+        setPill(`retiro en tienda · código ${p.code}`,'ok');
+        $('#codeBox').textContent=p.code;
+      }
+      // Si hay despacho, reflejar dirección/eta si corresponde
+      if(d){
+        if(p.method==='domicilio'){ d.address=p.address; d.eta=p.eta; upsertDispatch(d); }
+      }
+    }
+
+    function renderLogs(){
+      const arr=JSON.parse(localStorage.getItem(LS_DELIVERY_LOG)||'[]');
+      const l1=$('#log1'), l2=$('#log2'), l3=$('#log3'); [l1,l2,l3].forEach(x=>x.innerHTML='<strong>Bitácora</strong>');
+      arr.slice(0,8).forEach(t=>{ const div=document.createElement('div'); div.textContent=t; l1.appendChild(div.cloneNode(true)); l2.appendChild(div.cloneNode(true)); l3.appendChild(div.cloneNode(true)); });
+    }
+
+    // ===== Acciones domicilio =====
+    function recalc(){
+      const comuna=$('#comuna').value; const win=parseInt($('#window').value,10);
+      const fee=FEES[comuna]||2500; const eta=rangeFromNow(win);
+      $('#fee').textContent=currency(fee);
+      $('#etaBox').textContent=eta;
+      $('#addr3').textContent=$('#addr').value||'Ictinos 201';
+      $('#fee3').textContent=currency(fee);
+      $('#eta3').textContent=eta;
+    }
+
+    function confirmHome(){
+      const d=getActiveDispatch();
+      if(d && (d.status==='entregado'||d.status==='cancelado')){ toast('No puedes modificar una orden entregada/cancelada'); return; }
+      const comuna=$('#comuna').value; const fee=FEES[comuna]||2500;
+      const pref={ method:'domicilio', orderId: $('#oId1').textContent, address:($('#addr').value||'Ictinos 201'), fee, eta:$('#etaBox').textContent };
+      savePref(pref); paintFromPref();
+      pushLog(`domicilio confirmado · ${pref.orderId} · ${pref.address} · ${currency(fee)} · ${pref.eta}`);
+      // Sincroniza con despacho
+      if(d){ d.address=pref.address; d.status=d.status||'asignado'; d.eta=pref.eta; upsertDispatch(d); }
+      toast('Despacho a domicilio confirmado');
+    }
+
+    // ===== Acciones retiro =====
+    function genCode(){ return 'CHO-'+Math.floor(100000+Math.random()*900000); }
+    function confirmSendCode(){
+      const email=$('#email').value || 'cliente@example.com';
+      const code=genCode();
+      const expireAt = Date.now()+2*60*60*1000; // 2h
+      $('#codeBox').textContent=code;
+      const pref={ method:'retiro', orderId: $('#oId2').textContent, email, code, expireAt };
+      savePref(pref); paintFromPref();
+      pushLog(`código enviado · ${pref.orderId} · ${email} · ${code}`);
+      toast('Código enviado a '+email);
+    }
+    async function copyCode(){
+      const code=$('#codeBox').textContent||''; if(code==='—'){ toast('Genera el código primero'); return; }
+      try{ await navigator.clipboard.writeText(code); toast('Código copiado'); }catch{ toast('No se pudo copiar'); }
+    }
+    function pasteSim(){
+      const p=loadPref(); if(!(p&&p.code)){ toast('No hay código generado'); return; }
+      // Simulamos escaneo/pegar y validamos vencimiento
+      if(p.expireAt && Date.now()>p.expireAt){ setPill('código vencido','warn'); toast('Código vencido, vuelve a generar'); return; }
+      setPill(`retiro en tienda · código ${p.code}`,'ok');
+      pushLog(`código verificado · ${p.orderId} · ${p.code}`);
+      toast('Código verificado ✓');
+    }
+    function confirmPickup(){
+      const p=loadPref();
+      if(!(p && p.method==='retiro' && p.code && (!p.expireAt || Date.now()<=p.expireAt))){ toast('Genera y verifica el código'); return; }
+      pushLog(`retiro confirmado · ${p.orderId}`);
+      toast('Retiro en tienda confirmado');
+    }
+
+    // ===== Acciones reprogramar =====
+    function confirmResched(){
+      const d=getActiveDispatch();
+      if(d && (d.status==='entregado'||d.status==='cancelado')){ toast('No puedes reprogramar; orden entregada/cancelada'); return; }
+      const val=$('#timeNew').value || '20:00';
+      const eta=rangeFromHourMinute(val);
+      $('#eta3').textContent=eta;
+      const p=loadPref();
+      if(p && p.method==='domicilio'){ p.eta=eta; savePref(p); }
+      if(d){ d.eta=eta; upsertDispatch(d); }
+      pushLog(`reprogramada · ${$('#oId1').textContent} · ${eta}`);
+      toast('Entrega reprogramada a '+eta);
+    }
+
+    // ===== Header =====
+    function seedDemo(){
+      const y=new Date().getFullYear();
+      const demo=[{id:`ORD-${y}-124`, date:nowISO(), address:'Ictinos 201', status:'asignado', eta:rangeFromNow(30), products:'1x Bombones'}];
+      localStorage.setItem(LS_DISP, JSON.stringify(demo));
+      localStorage.removeItem(LS_DELIVERY);
+      pushLog('demo cargada');
+      paintIds(); recalc(); paintFromPref();
+      toast('Demo cargada');
+    }
+    function clearAll(){
+      localStorage.removeItem(LS_DELIVERY);
+      localStorage.removeItem(LS_DELIVERY_LOG);
+      setPill('sin selección','info');
+      renderLogs();
+      toast('Preferencias borradas');
+    }
+
+    // ===== Logs render =====
+    function initLogsBoxes(){
+      $('#log1').innerHTML='<strong>Bitácora</strong>';
+      $('#log2').innerHTML='<strong>Bitácora</strong>';
+      $('#log3').innerHTML='<strong>Bitácora</strong>';
+      renderLogs();
+    }
+
+    // ===== Wiring =====
+    $('#calc').addEventListener('click', ()=>{ recalc(); toast('ETA recalculada'); });
+    $('#confirmHome').addEventListener('click', confirmHome);
+
+    $('#sendCode').addEventListener('click', confirmSendCode);
+    $('#copyCode').addEventListener('click', copyCode);
+    $('#pasteSim').addEventListener('click', pasteSim);
+    $('#confirmPickup').addEventListener('click', confirmPickup);
+
+    $('#confirmResched').addEventListener('click', confirmResched);
+
+    $('#seedDemo').addEventListener('click', seedDemo);
+    $('#clear').addEventListener('click', clearAll);
+
+    // ===== Init =====
+    (function init(){
+      document.getElementById('year').textContent=new Date().getFullYear();
+      paintIds(); recalc(); paintFromPref(); initLogsBoxes();
+    })();
+  </script>
 </body>
 </html>

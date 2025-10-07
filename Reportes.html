@@ -3,132 +3,439 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chocomanía — B-15 Reportes mensuales (skeleton)</title>
+  <title>Chocomanía · B-15 Reportes mensuales</title>
+  <meta name="description" content="Acceso admin, selector de mes con rango fijo, KPIs mensuales y tabla de compras con exportación.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --gap:16px; --border:2px; --radius:12px; }
-    * { box-sizing: border-box; } /* BOX MODEL */
-    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
+    :root{ --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08); --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1200px; margin:0 auto; padding:20px}
 
-    /* Header */
-    .header{
-      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
-      display:flex; align-items:center; justify-content:space-between; /* FLEX */
-    }
-    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
-    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
-    .small{ font-size:.85rem; color:#555; }
+    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px); background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem}
+    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
 
-    /* Secciones / tarjetas */
-    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
-    .card{ border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fafafa; }
+    .btn{border:1px solid var(--border); background:#fff; border-radius:999px; padding:8px 14px; cursor:pointer}
+    .btn.small{padding:6px 10px}
+    .btn.primary{background:var(--brand); color:#fff; border-color:transparent}
+    .muted{color:var(--muted)}
 
-    /* Form acceso */
-    .form{ display:flex; flex-direction:column; gap:12px; width:min(340px, 92vw); margin:auto; } /* FLEX */
-    .form label{ display:flex; flex-direction:column; gap:6px; } /* FLEX */
-    .form input{
-      padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fff;
-    }
-    .btn{ padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; }
+    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
+    .card{border:1px dashed #cfcfcf; border-radius:12px; padding:16px; background:#fafafa}
 
-    /* Panel de reporte */
-    .report{
-      display:grid; grid-template-columns: 260px 1fr; gap:var(--gap);  /* GRID SYSTEM */
-    }
-    @media (max-width: 920px){ .report{ grid-template-columns: 1fr; } }
+    .form{display:flex; flex-direction:column; gap:12px; width:min(360px, 92vw); margin:auto}
+    .form label{display:flex; flex-direction:column; gap:6px}
+    .form input{padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fff}
 
-    .picker{ border:1px dashed #ddd; border-radius:10px; padding:12px; background:#fff; }
-    .month-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; } /* FLEX */
-    .month-list li{ display:flex; align-items:center; gap:8px; } /* FLEX */
+    .report{display:grid; grid-template-columns: 260px 1fr; gap:var(--gap)}
+    @media (max-width: 980px){ .report{ grid-template-columns: 1fr; } }
 
-    .summary{
-      border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff;
-      display:flex; flex-direction:column; gap:10px; justify-content:center; /* FLEX */
-      min-height:140px;
-    }
-    .kpi{ font-size:1.15rem; }
-    .kpi b{ font-size:1.25rem; }
+    .picker{border:1px dashed #ddd; border-radius:10px; padding:12px; background:#fff}
+    .month-list{list-style:none; margin:0; padding:0; display:grid; gap:8px; max-height:520px; overflow:auto}
+    .month-list button{width:100%; text-align:left; border:1px solid var(--border); background:#fff; padding:8px 10px; border-radius:10px; cursor:pointer}
+    .month-list button.active{background:#ece7f6; border-color:#d9c8f0; font-weight:800}
 
-    .empty{ display:flex; align-items:center; justify-content:center; min-height:160px; /* FLEX */
-            border:1px dashed #ddd; border-radius:10px; background:#fff; font-weight:800; }
+    .summary{border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff; display:flex; flex-direction:column; gap:12px}
+    .kpis{display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px}
+    .kpi{border:1px dashed #e5e7eb; border-radius:12px; padding:12px; background:#fafafa}
+    .kpi .label{color:var(--muted); font-size:.9rem}
+    .kpi .value{font-size:1.25rem; font-weight:800}
+
+    .tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    canvas{width:100%; height:80px; background:#fafafa; border:1px dashed #e5e7eb; border-radius:10px}
+
+    .tableTools{display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .tableWrap{border:1px dashed #ddd; background:#fff; border-radius:10px; overflow:auto}
+    table{width:100%; border-collapse:separate; border-spacing:0}
+    thead th{position:sticky; top:0; background:#f3f4f6}
+    th, td{padding:10px 12px; border-bottom:1px solid #eee; text-align:left; white-space:nowrap}
+    tr:hover{background:#fafafa}
+    .status{padding:3px 8px; border-radius:999px; border:1px solid #ddd; font-weight:700; font-size:.8rem}
+    .s-ok{background:#ecfdf5; color:#065f46; border-color:#a7f3d0}
+    .s-cancel{background:#fef2f2; color:#991b1b; border-color:#fecaca}
+
+    .emptyCard{display:flex; align-items:center; justify-content:center; min-height:120px; border:1px dashed #ddd; border-radius:10px; background:#fff; font-weight:800}
+    .hide{display:none}
+    .sep{height:1px; background:#eee; margin:8px 0}
+    /* Toast */
+    .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
+    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
+    .toast.show{opacity:1; transform:translateY(0)}
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="row">
-      <strong>Chocomanía</strong>
-      <span class="tag">B-15 • Reportes mensuales</span>
-      <span class="tag">wireframe</span>
+  <header class="top">
+    <div class="container topbar">
+      <div class="brand"><div class="logo" aria-hidden="true"></div> Chocomanía</div>
+      <div class="tools">
+        <span id="who" class="muted">Sesión: invitado</span>
+        <button class="btn small" id="seedOrders" type="button">Sembrar compras demo</button>
+        <button class="btn small" id="seedReports" type="button">Sembrar resumen</button>
+        <button class="btn small" id="logout" type="button">Cerrar sesión</button>
+      </div>
     </div>
-    <div class="small">HTML5 + Grid + Flex + Box Model</div>
   </header>
 
-  <!-- ============= Escenario 1: Acceso personal (admin) ============= -->
-  <section class="section" aria-labelledby="esc1">
-    <h2 id="esc1">Escenario 1 — Acceso personal</h2>
-    <div class="card">
-      <form class="form" action="#" method="post">
-        <h3>Acceso personal</h3>
-        <label>correo
-          <input type="email" placeholder="admin@empresa.cl" />
-        </label>
-        <label>Password:
-          <input type="password" placeholder="********" />
-        </label>
-        <div><button class="btn" type="button">Ingresar</button></div>
-      </form>
-    </div>
-  </section>
+  <main class="container">
+    <!-- Escenario 1 -->
+    <section class="section">
+      <h2>Escenario 1 — Acceso personal</h2>
+      <div class="card">
+        <form class="form" id="loginForm">
+          <h3>Acceso personal</h3>
+          <label>Correo <input id="email" type="email" placeholder="admin@empresa.cl" required></label>
+          <label>Password <input id="pass" type="password" placeholder="********" required></label>
+          <div><button class="btn primary" type="submit">Ingresar</button></div>
+        </form>
+      </div>
+    </section>
 
-  <!-- ============= Escenario 2: Generación de reporte mensual (Enero 2025) ============= -->
-  <section class="section" aria-labelledby="esc2">
-    <h2 id="esc2">Escenario 2 — Reporte mensual: Enero 2025</h2>
+    <!-- Escenario 2 -->
+    <section class="section" id="sec2" style="display:none">
+      <h2>Escenario 2 — Reporte mensual</h2>
+      <div class="report">
+        <aside class="picker">
+          <div class="tools" style="justify-content:space-between">
+            <b>Mes</b>
+            <div>
+              <button id="prevMonth" class="btn small" type="button" title="Mes anterior">«</button>
+              <button id="nextMonth" class="btn small" type="button" title="Mes siguiente">»</button>
+            </div>
+          </div>
+          <ul class="month-list" id="monthList"></ul>
+        </aside>
 
-    <div class="report">
-      <!-- selector de meses -->
-      <aside class="picker">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-          <label for="fecha"><b>Fecha</b></label>
-          <button class="btn" type="button">▼</button>
-        </div>
-        <ul class="month-list" id="fecha">
-          <li><label><input type="checkbox" disabled /> Noviembre/2024</label></li>
-          <li><label><input type="checkbox" disabled /> Diciembre/2024</label></li>
-          <li><label><input type="checkbox" checked /> <b>Enero/2025</b></label></li>
-          <li><label><input type="checkbox" disabled /> Febrero/2025</label></li>
-        </ul>
-      </aside>
+        <section class="summary">
+          <div class="tools" style="justify-content:space-between">
+            <span class="muted" id="currentMonthLabel">—</span>
+            <div class="tools">
+              <button class="btn small" id="printBtn" type="button">Imprimir</button>
+              <button class="btn small" id="csvBtn" type="button">Exportar CSV</button>
+            </div>
+          </div>
 
-      <!-- KPIs -->
-      <section class="summary">
-        <div class="kpi"><b>Pedidos Totales:</b> 227</div>
-        <div class="kpi"><b>Ingresos:</b> $1.254.728</div>
-        <!-- si quieres, puedes añadir luego: Descuentos aplicados / Ticket promedio -->
-      </section>
-    </div>
-  </section>
+          <div class="kpis" id="kpis"></div>
+          <canvas id="spark"></canvas>
 
-  <!-- ============= Escenario 3: Validación de rango vacío (sin ventas) ============= -->
-  <section class="section" aria-labelledby="esc3">
-    <h2 id="esc3">Escenario 3 — Rango sin pedidos</h2>
+          <div class="sep"></div>
+          <div class="tableTools">
+            <div class="tools">
+              <input id="search" placeholder="Buscar ID/cliente…" style="padding:8px 10px; border:1px solid #d1d5db; border-radius:10px">
+              <select id="statusFilter" class="btn small">
+                <option value="all">Todos</option>
+                <option value="ok">Completados</option>
+                <option value="cancelado">Cancelados</option>
+              </select>
+              <select id="channelFilter" class="btn small">
+                <option value="all">Todos los canales</option>
+                <option value="web">Web</option>
+                <option value="tienda">Tienda</option>
+                <option value="delivery">Delivery</option>
+              </select>
+            </div>
+            <div class="tools">
+              <button class="btn small" id="ordersCsv" type="button">Exportar pedidos CSV</button>
+            </div>
+          </div>
 
-    <div class="report">
-      <aside class="picker">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-          <label for="fecha2"><b>Fecha</b></label>
-          <button class="btn" type="button">▼</button>
-        </div>
-        <ul class="month-list" id="fecha2">
-          <li><label><input type="checkbox" disabled /> Septiembre/2026</label></li>
-          <li><label><input type="checkbox" disabled /> Octubre/2026</label></li>
-          <li><label><input type="checkbox" checked /> <b>Noviembre/2026</b></label></li>
-          <li><label><input type="checkbox" disabled /> Diciembre/2026</label></li>
-        </ul>
-      </aside>
+          <div class="tableWrap">
+            <table id="ordersTable">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Fecha</th><th>Cliente</th><th>Canal</th><th>Estado</th><th>Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="emptyCard hide" id="emptyMsg">No existen ventas en este período.</div>
+        </section>
+      </div>
+    </section>
 
-      <section class="empty">
-        No existen ventas en este período
-      </section>
-    </div>
-  </section>
+    <!-- Escenario 3 -->
+    <section class="section" id="sec3" style="display:none">
+      <h2>Escenario 3 — Rango sin pedidos</h2>
+      <div class="card" id="empty">No existen ventas en este período.</div>
+    </section>
+  </main>
+
+  <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+  <footer class="container" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Reportes mensuales</footer>
+
+<script>
+/* ========= Util ========= */
+const $ = s=>document.querySelector(s); const $$ = s=>document.querySelectorAll(s);
+const pad=n=>String(n).padStart(2,'0');
+const currency=n=> (n||0).toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});
+const toast=(m)=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.querySelector('.toast-wrap').appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),200)},2200)};
+const monthsNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+const LS_ADMIN='choco_admin_user';
+const LS_ORDERS='choco_orders';
+const LS_REPORTS='choco_reports';
+
+/* ========= Auth ========= */
+function isLogged(){ return !!localStorage.getItem(LS_ADMIN); }
+function login(email){ localStorage.setItem(LS_ADMIN, email); paintAuth(); }
+function logout(){ localStorage.removeItem(LS_ADMIN); paintAuth(); }
+function paintAuth(){
+  const who=$('#who'); const user=localStorage.getItem(LS_ADMIN);
+  if(user){ who.textContent='Sesión: '+user; $('#sec2').style.display='block'; $('#sec3').style.display='block'; }
+  else { who.textContent='Sesión: invitado'; $('#sec2').style.display='none'; $('#sec3').style.display='none'; }
+}
+
+/* ========= Demo orders ========= */
+function seedOrders(){
+  // varias compras en distintos meses
+  const sample = (ymd, id, total, status='entregado', channel='web', name='Cliente') => ({
+    id:`ORD-${ymd.slice(0,4)}-${id}`,
+    date:`${ymd} ${pad(9 + (parseInt(id)%10))}:${pad((parseInt(id)*7)%60)}`,
+    total, status, channel, items:[{sku:'p21',name:'Chocolate Dubai',qty:1,price:4500}],
+    customer:{name:`${name} ${id}`, email:`c${id}@mail.com`}
+  });
+  const data = [
+    // 2024 fin de año
+    sample('2024-11-10','911', 10500,'entregado','web'),
+    sample('2024-12-03','912',  8500,'entregado','tienda'),
+    // 2025 con varios meses
+    sample('2025-01-02','101',  9500,'entregado','web'),
+    sample('2025-01-05','102', 12500,'entregado','tienda'),
+    sample('2025-01-14','103', 21500,'cancelado','web'),
+    sample('2025-02-06','104', 17900,'entregado','delivery'),
+    sample('2025-03-12','105',  9900,'entregado','web'),
+    sample('2025-04-19','106', 14500,'entregado','tienda'),
+    sample('2025-07-01','107', 10900,'entregado','web'),
+    sample('2025-10-08','108', 14900,'entregado','web'),
+  ];
+  localStorage.setItem(LS_ORDERS, JSON.stringify(data));
+  toast('Compras demo creadas');
+  buildMonthList(); selectMonth('2025-10'); // ejemplo: octubre 2025
+}
+
+/* ========= Reports seed (opcional) ========= */
+function seedReports(){
+  const r=[
+    {ym:'2025-01', orders:5, revenue:52900, cancelled:1, discounts:0},
+    {ym:'2024-12', orders:1, revenue:8500, cancelled:0, discounts:0},
+    {ym:'2026-11', orders:0, revenue:0, cancelled:0, discounts:0} // ejemplo vacío
+  ];
+  localStorage.setItem(LS_REPORTS, JSON.stringify(r));
+  toast('Resumen demo cargado');
+  buildMonthList();
+}
+
+/* ========= Data helpers ========= */
+const loadOrders=()=> JSON.parse(localStorage.getItem(LS_ORDERS)||'[]');
+const loadReports=()=> JSON.parse(localStorage.getItem(LS_REPORTS)||'[]');
+
+function ymFromDateStr(s){ const d=new Date(s.replace(' ','T')); return `${d.getFullYear()}-${pad(d.getMonth()+1)}`; }
+function labelOf(ym){ const [y,m]=ym.split('-').map(Number); return `${monthsNames[m-1]}/${y}`; }
+
+function monthOrders(ym){
+  const [Y,M]=ym.split('-').map(Number);
+  return loadOrders().filter(o=>{ const d=new Date(o.date.replace(' ','T')); return d.getFullYear()===Y && (d.getMonth()+1)===M; });
+}
+function aggFromOrders(ym){
+  const list=monthOrders(ym);
+  if(!list.length) return null;
+  let revenue=0,cancelled=0,done=0;
+  list.forEach(o=>{ if(o.status==='cancelado') cancelled++; else {done++; revenue+=(o.total||0);} });
+  return {ym, orders:done, revenue, cancelled, discounts:0, avg: done? Math.round(revenue/done):0};
+}
+
+/* ========= Rango fijo de meses (ene/2024 a dic/2026) ========= */
+const RANGE_START='2024-01';
+const RANGE_END='2026-12';
+function allMonthsInRange(){
+  const [sy,sm]=RANGE_START.split('-').map(Number);
+  const [ey,em]=RANGE_END.split('-').map(Number);
+  const out=[];
+  let y=sy,m=sm;
+  while(y<ey || (y===ey && m<=em)){
+    out.push(`${y}-${pad(m)}`);
+    m++; if(m>12){ m=1; y++; }
+  }
+  return out;
+}
+
+/* ========= UI: Meses ========= */
+function buildMonthList(){
+  const ul=$('#monthList'); ul.innerHTML='';
+  const months=allMonthsInRange();
+  months.forEach(m=>{
+    const b=document.createElement('button'); b.textContent=labelOf(m); b.dataset.ym=m;
+    b.addEventListener('click',()=> selectMonth(m));
+    ul.appendChild(b);
+  });
+}
+function setActiveMonthButton(ym){ $$('#monthList button').forEach(b=> b.classList.toggle('active', b.dataset.ym===ym)); }
+
+let currentYM='';
+function selectMonth(ym){
+  currentYM=ym; setActiveMonthButton(ym);
+  $('#currentMonthLabel').textContent=labelOf(ym);
+  renderKPIs(ym);
+  renderOrders(ym);
+  renderSpark(ym);
+  // Escenario 3: activar si no hay datos (ni pedidos ni resumen)
+  const hasData = (monthOrders(ym).length>0) || !!(loadReports().find(r=>r.ym===ym && (r.orders||r.revenue||r.cancelled)));
+  $('#sec3').style.display = isLogged() ? 'block' : 'none';
+  $('#empty').style.display = hasData ? 'none':'block';
+  // Mensaje vacío también en el escenario 2 (debajo de la tabla)
+  $('#emptyMsg').classList.toggle('hide', hasData);
+}
+
+/* ========= KPIs ========= */
+function kpi(label, value){ const d=document.createElement('div'); d.className='kpi'; d.innerHTML=`<div class="label">${label}</div><div class="value">${value}</div>`; return d; }
+function renderKPIs(ym){
+  const box=$('#kpis'); box.innerHTML='';
+  const data = loadReports().find(r=>r.ym===ym) || aggFromOrders(ym);
+  if(!data || (data.orders===0 && data.revenue===0 && data.cancelled===0)){
+    box.innerHTML='<div class="muted">No hay ventas registradas en este período.</div>'; return;
+  }
+  const avg = data.avg || (data.orders? Math.round(data.revenue/data.orders) : 0);
+  const cancelRate = (data.orders+data.cancelled)>0 ? Math.round((data.cancelled/(data.orders+data.cancelled))*100) : 0;
+  box.appendChild(kpi('Pedidos completados', (data.orders||0).toLocaleString('es-CL')));
+  box.appendChild(kpi('Ingresos', currency(data.revenue||0)));
+  box.appendChild(kpi('Cancelados', `${data.cancelled||0} (${cancelRate}%)`));
+  box.appendChild(kpi('Ticket promedio', currency(avg)));
+}
+
+/* ========= Sparkline simple ========= */
+function renderSpark(ym){
+  const cvs=$('#spark'); const ctx=cvs.getContext('2d');
+  cvs.width=cvs.clientWidth; cvs.height=cvs.clientHeight;
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  const list=monthOrders(ym);
+  if(!list.length){ ctx.fillStyle='#999'; ctx.fillText('Sin datos',10,20); return; }
+  const days = Array(31).fill(0);
+  list.forEach(o=>{ const d=new Date(o.date.replace(' ','T')).getDate(); if(o.status!=='cancelado') days[d-1]+=o.total||0; });
+  const max = Math.max(...days, 1);
+  const w = cvs.width/(days.length-1);
+  ctx.beginPath();
+  days.forEach((v,i)=>{
+    const x=i*w, y=cvs.height - (v/max)* (cvs.height-10) - 5;
+    i? ctx.lineTo(x,y): ctx.moveTo(x,y);
+  });
+  ctx.lineWidth=2; ctx.strokeStyle='#7d3c98'; ctx.stroke();
+}
+
+/* ========= Tabla de pedidos ========= */
+let lastSearch=''; let lastStatus='all'; let lastChannel='all';
+function renderOrders(ym){
+  const tbody=$('#ordersTable tbody'); tbody.innerHTML='';
+  let data=monthOrders(ym).map(o=>({
+    ...o,
+    _date:new Date(o.date.replace(' ','T')),
+  }));
+  // filtros
+  if(lastStatus!=='all') data=data.filter(o=> lastStatus==='ok'? o.status!=='cancelado' : o.status==='cancelado');
+  if(lastChannel!=='all') data=data.filter(o=> (o.channel||'web')===lastChannel);
+  if(lastSearch.trim()){
+    const s=lastSearch.trim().toLowerCase();
+    data=data.filter(o=> (o.id + (o.customer?.name||'') + (o.customer?.email||'')).toLowerCase().includes(s));
+  }
+  // sort por fecha
+  data.sort((a,b)=> a._date-b._date);
+  // rows
+  if(!data.length){
+    tbody.innerHTML='<tr><td colspan="6" class="muted">Sin compras para los filtros seleccionados.</td></tr>';
+    return;
+  }
+  data.forEach(o=>{
+    const tr=document.createElement('tr');
+    const badge = `<span class="status ${o.status==='cancelado'?'s-cancel':'s-ok'}">${o.status==='cancelado'?'CANCELADO':'OK'}</span>`;
+    tr.innerHTML=`
+      <td>${o.id}</td>
+      <td>${o._date.toLocaleString('es-CL',{dateStyle:'medium', timeStyle:'short'})}</td>
+      <td>${o.customer?.name||'-'}</td>
+      <td>${o.channel||'web'}</td>
+      <td>${badge}</td>
+      <td>${currency(o.total||0)}</td>
+    `;
+    tr.addEventListener('click', ()=> showOrder(o));
+    tbody.appendChild(tr);
+  });
+}
+
+/* ========= Detalle/print ========= */
+function showOrder(o){
+  const html=`<!doctype html><html><head><meta charset='utf-8'><title>${o.id}</title>
+  <style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px}h1{margin:0 0 10px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #e5e7eb;padding:8px 10px}</style>
+  </head><body>
+  <h1>${o.id}</h1>
+  <p><b>Fecha:</b> ${new Date(o.date.replace(' ','T')).toLocaleString('es-CL',{dateStyle:'full', timeStyle:'short'})}<br>
+     <b>Cliente:</b> ${o.customer?.name||'-'} · ${o.customer?.email||''}<br>
+     <b>Canal:</b> ${o.channel||'web'} · <b>Estado:</b> ${o.status}</p>
+  <table><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr>
+  ${(o.items||[]).map(it=>`<tr><td>${it.name}</td><td>${it.qty}</td><td>${currency(it.price)}</td><td>${currency((it.qty||1)*(it.price||0))}</td></tr>`).join('')}
+  <tr><td colspan="3"><b>Total</b></td><td><b>${currency(o.total||0)}</b></td></tr></table>
+  <script>setTimeout(()=>{try{window.print()}catch(e){}},250)<\/script>
+  </body></html>`;
+  const w=window.open('', '_blank', 'width=720,height=800'); w.document.write(html); w.document.close();
+}
+
+/* ========= CSV ========= */
+function exportSummaryCSV(ym){
+  const r = loadReports().find(x=>x.ym===ym) || aggFromOrders(ym);
+  if(!r){ toast('Sin datos'); return; }
+  const rows=[['mes','pedidos','ingresos','cancelados','descuentos','ticket_promedio'],
+              [r.ym, r.orders||0, r.revenue||0, r.cancelled||0, r.discounts||0, Math.round((r.revenue||0)/Math.max(1,(r.orders||0)))]];
+  const csv = rows.map(a=>a.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`reporte_${ym}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+function exportOrdersCSV(ym){
+  const list=monthOrders(ym);
+  if(!list.length){ toast('Sin compras'); return; }
+  const rows=[['id','fecha','cliente','email','canal','estado','total']];
+  list.forEach(o=> rows.push([o.id, o.date, o.customer?.name||'', o.customer?.email||'', o.channel||'web', o.status, o.total||0]));
+  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`pedidos_${ym}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+/* ========= Eventos ========= */
+$('#loginForm').addEventListener('submit', e=>{ e.preventDefault(); login($('#email').value||'admin@empresa.cl'); toast('Sesión iniciada'); buildMonthList(); selectMonth('2025-10'); });
+$('#logout').addEventListener('click', ()=>{ logout(); toast('Sesión cerrada'); });
+
+$('#seedOrders').addEventListener('click', seedOrders);
+$('#seedReports').addEventListener('click', seedReports);
+
+$('#csvBtn').addEventListener('click', ()=> exportSummaryCSV(currentYM));
+$('#printBtn').addEventListener('click', ()=> window.print());
+$('#ordersCsv').addEventListener('click', ()=> exportOrdersCSV(currentYM));
+
+$('#search').addEventListener('input', e=>{ lastSearch=e.target.value; renderOrders(currentYM); });
+$('#statusFilter').addEventListener('change', e=>{ lastStatus=e.target.value; renderOrders(currentYM); });
+$('#channelFilter').addEventListener('change', e=>{ lastChannel=e.target.value; renderOrders(currentYM); });
+
+$('#prevMonth').addEventListener('click', ()=> stepMonth(-1));
+$('#nextMonth').addEventListener('click', ()=> stepMonth(1));
+function stepMonth(delta){
+  const months=allMonthsInRange(); if(!months.length) return;
+  let idx = months.indexOf(currentYM); if(idx<0) idx=0;
+  const next = months[Math.min(months.length-1, Math.max(0, idx+delta))];
+  selectMonth(next);
+}
+
+/* ========= Init ========= */
+document.getElementById('year').textContent=new Date().getFullYear();
+paintAuth();
+if(isLogged()){
+  buildMonthList();
+  selectMonth('2025-10'); // por defecto
+}else{
+  buildMonthList(); // que ya se vean los meses aunque no hayas iniciado sesión
+}
+</script>
 </body>
 </html>
