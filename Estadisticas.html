@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chocomanía · B‑16 Estadísticas</title>
-  <meta name="description" content="Reportes mensuales con enlace a estadísticas: ranking de productos y clientes frecuentes por mes, con integración a datos locales si existen.">
+  <title>Chocomanía · B-16 Estadísticas</title>
+  <meta name="description" content="Reportes mensuales con KPIs, ranking de productos y clientes frecuentes. Selector de mes, impresión y exportación CSV.">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{ --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08); --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; }
+    :root{ --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08);
+      --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0; background:var(--bg); color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
@@ -17,37 +18,54 @@
     a:hover{text-decoration:underline}
     .container{max-width:1140px; margin:0 auto; padding:20px}
 
-    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px); background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
+    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px);
+      background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
     .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
     .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem}
-    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8);
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
     .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
     .btn{border:1px solid var(--border); background:#fff; border-radius:999px; padding:8px 14px; cursor:pointer}
     .btn.small{padding:6px 10px}
+    .btn.primary{background:var(--brand); color:#fff; border-color:transparent}
+    .muted{color:var(--muted)}
 
-    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
+    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
 
     .report{display:grid; grid-template-columns: 260px 1fr; gap:var(--gap)}
     @media (max-width: 920px){ .report{ grid-template-columns: 1fr; } }
 
     .picker{border:1px dashed #ddd; border-radius:10px; padding:12px; background:#fff}
-    .month-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
-    .month-list li{display:flex; align-items:center; gap:8px}
-    .summary{border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff; display:flex; flex-direction:column; gap:10px; justify-content:center; min-height:140px}
-    .kpi{font-size:1.15rem}
-    .kpi b{font-size:1.25rem}
-    a.btnlink{display:inline-block; margin-top:6px; padding:8px 12px; border:1px solid #666; border-radius:999px; background:#eee; text-decoration:none; color:inherit}
+    .month-list{list-style:none; margin:8px 0 0; padding:0; display:grid; gap:8px; max-height:520px; overflow:auto}
+    .month-list button{width:100%; text-align:left; border:1px solid var(--border); background:#fff;
+      padding:8px 10px; border-radius:10px; cursor:pointer}
+    .month-list button.active{background:#ece7f6; border-color:#d9c8f0; font-weight:800}
+    .nav-arrows{display:flex; gap:6px; align-items:center}
 
-    .stats{display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff}
+    .summary{display:grid; gap:12px}
+    .kpis{display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px}
+    .kpi{border:1px dashed #e5e7eb; border-radius:12px; padding:12px; background:#fafafa}
+    .kpi .label{color:var(--muted); font-size:.9rem}
+    .kpi .value{font-size:1.25rem; font-weight:800}
+
+    .tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .card{border:1px dashed #ddd; border-radius:10px; padding:12px; background:#fff}
+    .two{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    @media (max-width: 720px){ .two{grid-template-columns: 1fr;} }
+
     .box{border:1px dashed #cfcfcf; border-radius:10px; padding:12px; background:#fafafa}
-    .box h4{margin-top:0}
-    ol{margin:0; padding-left:18px}
-    .muted{color:var(--muted)}
+    ol{margin:0; padding-left:20px}
+    .empty{display:flex; align-items:center; justify-content:center; min-height:120px;
+      border:1px dashed #ddd; border-radius:10px; background:#fff; font-weight:800}
+    .hide{display:none}
 
-    /* Toast */
+    #bars{width:100%; height:160px; background:#fff; border:1px dashed #e5e7eb; border-radius:10px}
+
     .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
-    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
+    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow);
+      opacity:0; transform:translateY(-10px); transition:.25s}
     .toast.show{opacity:1; transform:translateY(0)}
   </style>
 </head>
@@ -56,238 +74,309 @@
     <div class="container topbar">
       <div class="brand"><div class="logo" aria-hidden="true"></div> Chocomanía</div>
       <div class="row">
-        <button class="btn small" id="seedBtn" type="button">Sembrar demo</button>
+        <button class="btn small" id="seedBtn" type="button">Sembrar ventas 09/2024–10/2025</button>
         <button class="btn small" id="clearBtn" type="button">Limpiar datos</button>
+        <span class="muted" id="hint"></span>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- ===== Escenario 1: Enero 2025 con enlace a estadísticas ===== -->
-    <section class="section" aria-labelledby="esc1">
-      <h2 id="esc1">Reportes mensuales — Enero 2025</h2>
+    <section class="section">
+      <h2>Estadísticas mensuales</h2>
       <div class="report">
         <aside class="picker">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-            <label for="m1"><b>Fecha</b></label>
+          <div class="tools" style="justify-content:space-between">
+            <b>Mes</b>
+            <div class="nav-arrows">
+              <button class="btn small" id="prevM" title="Mes anterior">«</button>
+              <button class="btn small" id="nextM" title="Mes siguiente">»</button>
+            </div>
           </div>
-          <ul class="month-list" id="m1">
-            <li><label><input type="checkbox" disabled /> Noviembre/2024</label></li>
-            <li><label><input type="checkbox" disabled /> Diciembre/2024</label></li>
-            <li><label><input type="checkbox" data-ym="2025-01" checked /> <b>Enero/2025</b></label></li>
-            <li><label><input type="checkbox" disabled /> Febrero/2025</label></li>
-          </ul>
+          <ul class="month-list" id="monthList"></ul>
         </aside>
-        <section class="summary" id="sum-2025-01">
-          <div class="kpi"><b>Pedidos Totales:</b> <span data-kpi="orders">227</span></div>
-          <div class="kpi"><b>Ingresos:</b> <span data-kpi="revenue">$1.254.728</span></div>
-          <a class="btnlink" href="#stats-ene">Estadísticas</a>
-        </section>
-      </div>
-    </section>
 
-    <!-- Panel de estadísticas Enero 2025 -->
-    <section id="stats-ene" class="section" aria-labelledby="esc1-stats">
-      <h2 id="esc1-stats">Estadísticas — Enero 2025</h2>
-      <div class="stats">
-        <div class="box">
-          <h4>Productos (Top 5)</h4>
-          <ol id="prod-2025-01">
-            <li>Chocolate Dubai</li>
-            <li>Bombones Surtidos</li>
-            <li>Frutillas con chocolate</li>
-            <li>Chocolate Amargo 70%</li>
-            <li>Chocolate Caliente</li>
-          </ol>
-        </div>
-        <div class="box">
-          <h4>Vendidos</h4>
-          <ol class="muted" id="qty-2025-01">
-            <li>72 pedidos</li>
-            <li>64 pedidos</li>
-            <li>47 pedidos</li>
-            <li>29 pedidos</li>
-            <li>14 pedidos</li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Escenario 2: Febrero 2025 ===== -->
-    <section class="section" aria-labelledby="esc2">
-      <h2 id="esc2">Reportes mensuales — Febrero 2025</h2>
-      <div class="report">
-        <aside class="picker">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-            <label for="m2"><b>Fecha</b></label>
+        <section class="summary">
+          <div class="tools" style="justify-content:space-between">
+            <span class="muted" id="monthLabel">—</span>
+            <div class="tools">
+              <button class="btn small" id="printBtn">Imprimir</button>
+              <button class="btn small" id="csvSummary">Exportar resumen CSV</button>
+              <button class="btn small" id="csvStats">Exportar rankings CSV</button>
+            </div>
           </div>
-          <ul class="month-list" id="m2">
-            <li><label><input type="checkbox" disabled /> Diciembre/2024</label></li>
-            <li><label><input type="checkbox" disabled /> Enero/2025</label></li>
-            <li><label><input type="checkbox" data-ym="2025-02" checked /> <b>Febrero/2025</b></label></li>
-            <li><label><input type="checkbox" disabled /> Marzo/2025</label></li>
-          </ul>
-        </aside>
-        <section class="summary" id="sum-2025-02">
-          <div class="kpi"><b>Pedidos Totales:</b> <span data-kpi="orders">328</span></div>
-          <div class="kpi"><b>Ingresos:</b> <span data-kpi="revenue">$1.972.694</span></div>
-          <a class="btnlink" href="#stats-feb">Estadísticas</a>
-        </section>
-      </div>
-    </section>
 
-    <!-- Panel de estadísticas Febrero 2025 -->
-    <section id="stats-feb" class="section" aria-labelledby="esc2-stats">
-      <h2 id="esc2-stats">Estadísticas — Febrero 2025</h2>
-      <div class="stats">
-        <div class="box">
-          <h4>Productos (Top 5)</h4>
-          <ol id="prod-2025-02">
-            <li>Trufa Avellana</li>
-            <li>Bombón Amargo</li>
-            <li>—</li>
-            <li>—</li>
-            <li>—</li>
-          </ol>
-        </div>
-        <div class="box">
-          <h4>Clientes frecuentes (Top 5)</h4>
-          <ol class="muted" id="cli-2025-02">
-            <li>ana@example.com</li>
-            <li>pedro@example.com</li>
-            <li>—</li>
-            <li>—</li>
-            <li>—</li>
-          </ol>
-        </div>
+          <div class="kpis" id="kpis"></div>
+
+          <div class="two">
+            <div class="card">
+              <h4 style="margin:0 0 8px">Top productos (qty)</h4>
+              <ol id="topProducts" class="box"></ol>
+            </div>
+            <div class="card">
+              <h4 style="margin:0 0 8px">Clientes frecuentes</h4>
+              <ol id="topClients" class="box"></ol>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 style="margin:0 0 8px">Distribución de los 5 productos más vendidos</h4>
+            <canvas id="bars"></canvas>
+          </div>
+
+          <div class="empty hide" id="emptyMsg">No existen ventas en este período.</div>
+        </section>
       </div>
     </section>
   </main>
 
   <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
 
-  <footer class="container" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Estadísticas</footer>
+<script>
+/* ===== Util ===== */
+const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
+const pad = n => String(n).padStart(2,'0');
+const CLP = n => (n||0).toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});
+const toast = m => { const t=document.createElement('div'); t.className='toast'; t.textContent=m;
+  document.querySelector('.toast-wrap').appendChild(t); requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),200); }, 2200); };
+const monthsNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-  <script>
-    // ===== Utilidades =====
-    const $ = (s)=> document.querySelector(s);
-    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.querySelector('.toast-wrap').appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),200); }, 2200); }
-    function currency(n){ return n.toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}); }
+const LS_ORDERS='choco_orders';
 
-    // ===== Storage Keys =====
-    const LS_REPORTS='choco_reports'; // de la Parte 15
-    const LS_STATS='choco_stats';     // { '2025-01': {products:[{name,qty}], clients:[{email,qty}]}, ... }
-    const LS_ORDERS='choco_orders';   // opcional: orders con items para agregar
+/* ===== Catálogo realista ===== */
+const CATALOG = [
+  {sku:'p21', name:'Chocolate Dubai', price:4500, w:12},
+  {sku:'p02', name:'Bombones Surtidos', price:12500, w:10},
+  {sku:'p03', name:'Trufa Avellana', price:9000, w:8},
+  {sku:'p04', name:'Bombón Amargo', price:9900, w:7},
+  {sku:'p05', name:'Chocolate con Almendras', price:14500, w:7},
+  {sku:'p06', name:'Chocolate Blanco', price:8500, w:6},
+  {sku:'p07', name:'Chocolate Amargo 70%', price:21500, w:4},
+  {sku:'p08', name:'Brownies x6', price:7800, w:6},
+  {sku:'p09', name:'Frutillas con chocolate', price:7900, w:5},
+  {sku:'p10', name:'Chocolate Caliente', price:3500, w:5},
+  {sku:'p11', name:'Caja regalo premium', price:24900, w:3},
+];
 
-    // ===== Datos demo para esta parte =====
-    function seedDemo(){
-      const reports=[
-        {ym:'2025-01', orders:227, revenue:1254728},
-        {ym:'2025-02', orders:328, revenue:1972694}
-      ];
-      localStorage.setItem(LS_REPORTS, JSON.stringify(reports));
-      const stats={
-        '2025-01': { products:[
-          {name:'Chocolate Dubai', qty:72},
-          {name:'Bombones Surtidos', qty:64},
-          {name:'Frutillas con chocolate', qty:47},
-          {name:'Chocolate Amargo 70%', qty:29},
-          {name:'Chocolate Caliente', qty:14}
-        ], clients:[] },
-        '2025-02': { products:[
-          {name:'Trufa Avellana', qty:81},
-          {name:'Bombón Amargo', qty:62},
-          {name:'Chocolate con Almendras', qty:44},
-          {name:'Trufa de Cacao', qty:31},
-          {name:'Chocolate Blanco', qty:19}
-        ], clients:[
-          {email:'ana@example.com', qty:9},
-          {email:'pedro@example.com', qty:7},
-          {email:'luis@example.com', qty:5},
-          {email:'marta@example.com', qty:4},
-          {email:'lucia@example.com', qty:4}
-        ] }
-      };
-      localStorage.setItem(LS_STATS, JSON.stringify(stats));
-      renderAll(); toast('Demo sembrada');
-    }
+/* ===== RNG determinista (para que siempre genere igual) ===== */
+function mulberry32(a){ return function(){ let t=a+=0x6D2B79F5; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; } }
+let rnd = mulberry32(0xC0C0A);
 
-    function loadReports(){ try{return JSON.parse(localStorage.getItem(LS_REPORTS))||[]}catch{return[]} }
-    function loadStats(){ try{return JSON.parse(localStorage.getItem(LS_STATS))||{}}catch{return{}} }
+/* Helpers elección ponderada */
+function pickWeighted(items){ const sum = items.reduce((s,i)=>s+i.w,0); let r=rnd()*sum; for(const it of items){ if((r-=it.w)<=0) return it; } return items[0]; }
+function randInt(min,max){ return Math.floor(rnd()*(max-min+1))+min; }
 
-    // ===== Agregación opcional desde choco_orders =====
-    function aggregateFromOrders(ym){
-      try{
-        const arr=JSON.parse(localStorage.getItem(LS_ORDERS)||'[]');
-        if(!arr.length) return null;
-        const [y,m]=ym.split('-').map(Number);
-        const sameMonth=(d)=>{ const dt=new Date((d||'').replace(' ','T')); return dt.getFullYear()===y && (dt.getMonth()+1)===m; };
-        const prodMap=new Map(); const cliMap=new Map(); let orders=0, revenue=0;
-        arr.forEach(o=>{
-          if(!sameMonth(o.date)) return;
-          orders++;
-          revenue += (o.total||0);
-          const lines = o.items || o.lines || [];
-          lines.forEach(l=>{
-            const name = l.name || l.product || 'Producto';
-            const qty = Number(l.qty||l.quantity||1);
-            prodMap.set(name, (prodMap.get(name)||0)+qty);
-          });
-          const email = o.email || o.customer || o.user || 'cliente@example.com';
-          cliMap.set(email, (cliMap.get(email)||0)+1);
-        });
-        const topProducts = [...prodMap.entries()].map(([name,qty])=>({name,qty})).sort((a,b)=>b.qty-a.qty).slice(0,5);
-        const topClients = [...cliMap.entries()].map(([email,qty])=>({email,qty})).sort((a,b)=>b.qty-a.qty).slice(0,5);
-        return { orders, revenue, topProducts, topClients };
-      }catch{ return null }
-    }
+/* ===== Seed ventas Sept/2024 → Oct/2025 ===== */
+function seedRealistic(){
+  rnd = mulberry32(0xBEEFF); // reset semilla para resultados estables
+  const monthsPlan = {
+    '2024-09':  80, '2024-10': 95,  '2024-11':120, '2024-12':220, // navidad
+    '2025-01': 160, '2025-02':210,  '2025-03':130, '2025-04':120,
+    '2025-05': 180, '2025-06':120,  '2025-07':110, '2025-08':130,
+    '2025-09': 150, '2025-10':170
+  };
 
-    // ===== Render helpers =====
-    function applySummary(ym, mountSel){
-      const rep = loadReports().find(r=>r.ym===ym);
-      if(!rep) return;
-      const mount = document.querySelector(mountSel);
-      if(!mount) return;
-      mount.querySelector('[data-kpi="orders"]').textContent = (rep.orders||0).toLocaleString('es-CL');
-      mount.querySelector('[data-kpi="revenue"]').textContent = currency(rep.revenue||0);
-    }
+  let seq = 500; // correr numeración para no chocar con otros demos
+  const orders = [];
 
-    function fillList(listSel, items, formatter){
-      const ol = document.querySelector(listSel); if(!ol) return;
-      ol.innerHTML = '';
-      items.forEach(it=>{
-        const li=document.createElement('li'); li.textContent = formatter(it); ol.appendChild(li);
+  const channelPick = ()=> (rnd()<0.55?'web':(rnd()<0.67?'tienda':'delivery')); // 55/30/15
+  const cancelProbByMonth = ym => (ym.endsWith('-12')?0.05: ym.endsWith('-02')?0.06:0.07); // menos cancel en fechas fuertes
+  const seasonalBoost = (ym, p) => {
+    // reforzar surtidos en feb, caja premium en dic, brownies en invierno
+    if(ym.endsWith('-12') && p.sku==='p11') return p.w+6;
+    if(ym.endsWith('-02') && (p.sku==='p02'||p.sku==='p09')) return p.w+5;
+    if(/-06|-07/.test(ym) && (p.sku==='p08'||p.sku==='p10')) return p.w+3;
+    return p.w;
+  };
+
+  Object.entries(monthsPlan).forEach(([ym, target])=>{
+    const [y,m] = ym.split('-').map(Number);
+    const daysInMonth = new Date(y, m, 0).getDate();
+
+    for(let i=0;i<target;i++){
+      const day = randInt(1, daysInMonth);
+      const hh  = randInt(9, 20), mm = randInt(0,59);
+      const id  = `ORD-${y}-${++seq}`;
+      const date = `${ym}-${pad(day)} ${pad(hh)}:${pad(mm)}`;
+      const channel = channelPick();
+
+      // líneas: 1–3 productos, con cantidades 1–3
+      const linesCount = randInt(1,3);
+      const lines=[];
+      let localCatalog = CATALOG.map(p=>({...p, w: seasonalBoost(ym,p)}));
+      for(let k=0;k<linesCount;k++){
+        const prod = pickWeighted(localCatalog);
+        const qty  = randInt(1, prod.price>20000?1:3);
+        lines.push({sku:prod.sku, name:prod.name, qty, price:prod.price});
+      }
+      const total = lines.reduce((s,l)=> s+(l.qty*l.price), 0);
+
+      const cancelled = rnd() < cancelProbByMonth(ym);
+      const status = cancelled? 'cancelado':'entregado';
+      const nameId = randInt(100,999);
+      orders.push({
+        id, date, total, status, channel,
+        items: lines, customer:{name:`Cliente ${nameId}`, email:`c${nameId}@mail.com`}
       });
     }
+  });
 
-    function renderStatsForMonth(ym){
-      const stats = loadStats();
-      const agg = aggregateFromOrders(ym);
-      const prod = agg?.topProducts || stats[ym]?.products || [];
-      const clis = agg?.topClients || stats[ym]?.clients || [];
-      if(ym==='2025-01'){
-        if(prod.length){ fillList('#prod-2025-01', prod, x=>x.name); fillList('#qty-2025-01', prod, x=>`${x.qty} pedidos`); }
-      }
-      if(ym==='2025-02'){
-        if(prod.length){ fillList('#prod-2025-02', prod, x=>x.name); }
-        if(clis.length){ fillList('#cli-2025-02', clis, x=>`${x.email}`); }
-      }
-    }
+  localStorage.setItem(LS_ORDERS, JSON.stringify(orders));
+  toast(`Ventas sembradas: ${orders.length.toLocaleString('es-CL')} pedidos`);
+  buildMonthList(); selectMonth('2025-10');
+}
 
-    function renderAll(){
-      applySummary('2025-01', '#sum-2025-01');
-      applySummary('2025-02', '#sum-2025-02');
-      renderStatsForMonth('2025-01');
-      renderStatsForMonth('2025-02');
-    }
+/* ===== Datos / agregación ===== */
+const loadOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS)||'[]');
 
-    // ===== Eventos header =====
-    document.getElementById('seedBtn').addEventListener('click', seedDemo);
-    document.getElementById('clearBtn').addEventListener('click', ()=>{ localStorage.removeItem(LS_REPORTS); localStorage.removeItem(LS_STATS); renderAll(); toast('Datos borrados'); });
+function monthLabel(ym){ const [y,m]=ym.split('-').map(Number); return `${monthsNames[m-1]}/${y}`; }
 
-    // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    renderAll();
-  </script>
+function monthOrders(ym){
+  const [Y,M]=ym.split('-').map(Number);
+  return loadOrders().filter(o=>{ const d=new Date((o.date||'').replace(' ','T')); return d.getFullYear()===Y && (d.getMonth()+1)===M; });
+}
+
+function aggregate(ym){
+  const list = monthOrders(ym);
+  if(!list.length) return null;
+
+  let done=0, cancelled=0, revenue=0;
+  const prod = new Map(); // name -> qty
+  const clients = new Map(); // email -> count
+
+  list.forEach(o=>{
+    const isCancel = (o.status||'')==='cancelado';
+    if(isCancel){ cancelled++; }
+    else { done++; revenue += (o.total||0); }
+    (o.items||[]).forEach(l=>{
+      const name = l.name || 'Producto'; const qty = Number(l.qty||1);
+      prod.set(name, (prod.get(name)||0) + qty);
+    });
+    const email = (o.customer?.email) || 'cliente@example.com';
+    clients.set(email, (clients.get(email)||0)+1);
+  });
+
+  const topProducts = [...prod.entries()].map(([name,qty])=>({name,qty})).sort((a,b)=>b.qty-a.qty).slice(0,5);
+  const topClients  = [...clients.entries()].map(([email,qty])=>({email,qty})).sort((a,b)=>b.qty-a.qty).slice(0,5);
+  const avg = done? Math.round(revenue/done):0;
+
+  return {orders:done, cancelled, revenue, avg, topProducts, topClients};
+}
+
+/* ===== Rango de meses (amplio, pero tus datos están en 09/2024–10/2025) ===== */
+const RANGE_START='2024-01', RANGE_END='2026-12';
+function allMonths(){
+  const [sy,sm]=RANGE_START.split('-').map(Number), [ey,em]=RANGE_END.split('-').map(Number);
+  const out=[]; let y=sy,m=sm;
+  while(y<ey || (y===ey && m<=em)){ out.push(`${y}-${pad(m)}`); m++; if(m>12){m=1;y++;} }
+  return out;
+}
+
+/* ===== UI Meses ===== */
+function buildMonthList(){
+  const ul=$('#monthList'); ul.innerHTML='';
+  allMonths().forEach(ym=>{
+    const b=document.createElement('button');
+    b.textContent=monthLabel(ym); b.dataset.ym=ym; b.addEventListener('click',()=>selectMonth(ym));
+    ul.appendChild(b);
+  });
+}
+function setActive(ym){ $$('#monthList button').forEach(b=> b.classList.toggle('active', b.dataset.ym===ym)); }
+
+let CURRENT='';
+
+function selectMonth(ym){
+  CURRENT=ym; setActive(ym);
+  $('#monthLabel').textContent=monthLabel(ym);
+  paintKPIs(ym); paintLists(ym); paintBars(ym);
+  const has = !!aggregate(ym);
+  $('#emptyMsg').classList.toggle('hide', has);
+}
+
+/* ===== Render KPIs ===== */
+function kpi(label, value){ const d=document.createElement('div'); d.className='kpi';
+  d.innerHTML=`<div class="label">${label}</div><div class="value">${value}</div>`; return d; }
+
+function paintKPIs(ym){
+  const box=$('#kpis'); box.innerHTML='';
+  const data = aggregate(ym);
+  if(!data){ box.innerHTML='<div class="muted">No hay ventas registradas en este período.</div>'; return; }
+  box.appendChild(kpi('Pedidos completados', data.orders.toLocaleString('es-CL')));
+  box.appendChild(kpi('Ingresos', CLP(data.revenue)));
+  const cancelRate = (data.orders+data.cancelled)>0 ? Math.round((data.cancelled/(data.orders+data.cancelled))*100) : 0;
+  box.appendChild(kpi('Cancelados', `${data.cancelled} (${cancelRate}%)`));
+  box.appendChild(kpi('Ticket promedio', CLP(data.avg)));
+}
+
+/* ===== Listas y gráfico ===== */
+function paintLists(ym){
+  const data = aggregate(ym);
+  const P=$('#topProducts'), C=$('#topClients'); P.innerHTML=''; C.innerHTML='';
+  if(!data){ return; }
+  data.topProducts.forEach(x=>{ const li=document.createElement('li'); li.textContent=`${x.name} — ${x.qty}`; P.appendChild(li); });
+  data.topClients.forEach(x=>{ const li=document.createElement('li'); li.textContent=`${x.email} — ${x.qty} pedido(s)`; C.appendChild(li); });
+}
+
+function paintBars(ym){
+  const cvs=$('#bars'), ctx=cvs.getContext('2d');
+  cvs.width=cvs.clientWidth; cvs.height=160;
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  const data = aggregate(ym);
+  if(!data || !data.topProducts.length){ ctx.fillStyle='#666'; ctx.fillText('Sin datos',10,20); return; }
+  const arr = data.topProducts.slice(0,5);
+  const max = Math.max(...arr.map(x=>x.qty), 1);
+  const barW = Math.floor(cvs.width/(arr.length*1.6));
+  const gap = barW*0.6; const base = cvs.height-24;
+
+  ctx.font='12px Inter';
+  arr.forEach((x,idx)=>{
+    const h = Math.round((x.qty/max)*(cvs.height-40));
+    const x0 = 20 + idx*(barW+gap);
+    ctx.fillStyle='#7d3c98'; ctx.fillRect(x0, base-h, barW, h);
+    ctx.fillStyle='#111'; ctx.fillText(x.qty, x0+barW/4, base-h-6);
+    ctx.save(); ctx.translate(x0+barW/2, base+12); ctx.rotate(-Math.PI/6);
+    ctx.fillStyle='#333'; ctx.fillText(x.name.slice(0,16), -30, 0); ctx.restore();
+  });
+}
+
+/* ===== CSV & Print ===== */
+function csvSummary(){
+  const d=aggregate(CURRENT); if(!d){ toast('Sin datos'); return; }
+  const rows=[['mes','pedidos','ingresos','cancelados','ticket_promedio'],
+              [CURRENT,d.orders,d.revenue,d.cancelled,d.avg]];
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=`reporte_${CURRENT}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+function csvStats(){
+  const d=aggregate(CURRENT); if(!d){ toast('Sin datos'); return; }
+  const rows=[['top_product','qty'], ...d.topProducts.map(x=>[x.name,x.qty]), [], ['client','orders'], ...d.topClients.map(x=>[x.email,x.qty])];
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=`rankings_${CURRENT}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+/* ===== Eventos ===== */
+$('#seedBtn').addEventListener('click', seedRealistic);
+$('#clearBtn').addEventListener('click', ()=>{ localStorage.removeItem(LS_ORDERS); toast('Datos limpiados'); buildMonthList(); selectMonth('2025-10'); });
+
+$('#prevM').addEventListener('click', ()=> step(-1));
+$('#nextM').addEventListener('click', ()=> step(1));
+function step(delta){
+  const months=allMonths(); let i=months.indexOf(CURRENT); if(i<0) i=0;
+  const next = months[Math.min(months.length-1, Math.max(0, i+delta))];
+  selectMonth(next);
+}
+
+$('#printBtn').addEventListener('click', ()=> window.print());
+$('#csvSummary').addEventListener('click', csvSummary);
+$('#csvStats').addEventListener('click', csvStats);
+
+/* ===== Init ===== */
+document.getElementById('hint').textContent='Tip: pulsa “Sembrar ventas” para cargar datos reales de demo.';
+buildMonthList();
+selectMonth('2025-10'); // arranque en el último mes del rango
+</script>
 </body>
 </html>

@@ -64,6 +64,7 @@
     .emptyCard{display:flex; align-items:center; justify-content:center; min-height:120px; border:1px dashed #ddd; border-radius:10px; background:#fff; font-weight:800}
     .hide{display:none}
     .sep{height:1px; background:#eee; margin:8px 0}
+
     /* Toast */
     .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
     .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
@@ -86,7 +87,7 @@
   <main class="container">
     <!-- Escenario 1 -->
     <section class="section">
-      <h2>Escenario 1 — Acceso personal</h2>
+      <h2>Acceso personal</h2>
       <div class="card">
         <form class="form" id="loginForm">
           <h3>Acceso personal</h3>
@@ -99,7 +100,7 @@
 
     <!-- Escenario 2 -->
     <section class="section" id="sec2" style="display:none">
-      <h2>Escenario 2 — Reporte mensual</h2>
+      <h2>Reporte mensual</h2>
       <div class="report">
         <aside class="picker">
           <div class="tools" style="justify-content:space-between">
@@ -159,16 +160,9 @@
         </section>
       </div>
     </section>
-
-    <!-- Escenario 3 -->
-    <section class="section" id="sec3" style="display:none">
-      <h2>Escenario 3 — Rango sin pedidos</h2>
-      <div class="card" id="empty">No existen ventas en este período.</div>
-    </section>
   </main>
 
   <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
-  <footer class="container" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Reportes mensuales</footer>
 
 <script>
 /* ========= Util ========= */
@@ -188,13 +182,12 @@ function login(email){ localStorage.setItem(LS_ADMIN, email); paintAuth(); }
 function logout(){ localStorage.removeItem(LS_ADMIN); paintAuth(); }
 function paintAuth(){
   const who=$('#who'); const user=localStorage.getItem(LS_ADMIN);
-  if(user){ who.textContent='Sesión: '+user; $('#sec2').style.display='block'; $('#sec3').style.display='block'; }
-  else { who.textContent='Sesión: invitado'; $('#sec2').style.display='none'; $('#sec3').style.display='none'; }
+  if(user){ who.textContent='Sesión: '+user; $('#sec2').style.display='block'; }
+  else { who.textContent='Sesión: invitado'; $('#sec2').style.display='none'; }
 }
 
 /* ========= Demo orders ========= */
 function seedOrders(){
-  // varias compras en distintos meses
   const sample = (ymd, id, total, status='entregado', channel='web', name='Cliente') => ({
     id:`ORD-${ymd.slice(0,4)}-${id}`,
     date:`${ymd} ${pad(9 + (parseInt(id)%10))}:${pad((parseInt(id)*7)%60)}`,
@@ -202,10 +195,8 @@ function seedOrders(){
     customer:{name:`${name} ${id}`, email:`c${id}@mail.com`}
   });
   const data = [
-    // 2024 fin de año
     sample('2024-11-10','911', 10500,'entregado','web'),
     sample('2024-12-03','912',  8500,'entregado','tienda'),
-    // 2025 con varios meses
     sample('2025-01-02','101',  9500,'entregado','web'),
     sample('2025-01-05','102', 12500,'entregado','tienda'),
     sample('2025-01-14','103', 21500,'cancelado','web'),
@@ -217,7 +208,7 @@ function seedOrders(){
   ];
   localStorage.setItem(LS_ORDERS, JSON.stringify(data));
   toast('Compras demo creadas');
-  buildMonthList(); selectMonth('2025-10'); // ejemplo: octubre 2025
+  buildMonthList(); selectMonth('2025-10');
 }
 
 /* ========= Reports seed (opcional) ========= */
@@ -225,7 +216,7 @@ function seedReports(){
   const r=[
     {ym:'2025-01', orders:5, revenue:52900, cancelled:1, discounts:0},
     {ym:'2024-12', orders:1, revenue:8500, cancelled:0, discounts:0},
-    {ym:'2026-11', orders:0, revenue:0, cancelled:0, discounts:0} // ejemplo vacío
+    {ym:'2026-11', orders:0, revenue:0, cancelled:0, discounts:0}
   ];
   localStorage.setItem(LS_REPORTS, JSON.stringify(r));
   toast('Resumen demo cargado');
@@ -236,7 +227,6 @@ function seedReports(){
 const loadOrders=()=> JSON.parse(localStorage.getItem(LS_ORDERS)||'[]');
 const loadReports=()=> JSON.parse(localStorage.getItem(LS_REPORTS)||'[]');
 
-function ymFromDateStr(s){ const d=new Date(s.replace(' ','T')); return `${d.getFullYear()}-${pad(d.getMonth()+1)}`; }
 function labelOf(ym){ const [y,m]=ym.split('-').map(Number); return `${monthsNames[m-1]}/${y}`; }
 
 function monthOrders(ym){
@@ -251,7 +241,7 @@ function aggFromOrders(ym){
   return {ym, orders:done, revenue, cancelled, discounts:0, avg: done? Math.round(revenue/done):0};
 }
 
-/* ========= Rango fijo de meses (ene/2024 a dic/2026) ========= */
+/* ========= Rango de meses ========= */
 const RANGE_START='2024-01';
 const RANGE_END='2026-12';
 function allMonthsInRange(){
@@ -260,7 +250,7 @@ function allMonthsInRange(){
   const out=[];
   let y=sy,m=sm;
   while(y<ey || (y===ey && m<=em)){
-    out.push(`${y}-${pad(m)}`);
+    out.push(`${y}-${String(m).padStart(2,'0')}`);
     m++; if(m>12){ m=1; y++; }
   }
   return out;
@@ -285,11 +275,7 @@ function selectMonth(ym){
   renderKPIs(ym);
   renderOrders(ym);
   renderSpark(ym);
-  // Escenario 3: activar si no hay datos (ni pedidos ni resumen)
   const hasData = (monthOrders(ym).length>0) || !!(loadReports().find(r=>r.ym===ym && (r.orders||r.revenue||r.cancelled)));
-  $('#sec3').style.display = isLogged() ? 'block' : 'none';
-  $('#empty').style.display = hasData ? 'none':'block';
-  // Mensaje vacío también en el escenario 2 (debajo de la tabla)
   $('#emptyMsg').classList.toggle('hide', hasData);
 }
 
@@ -309,7 +295,7 @@ function renderKPIs(ym){
   box.appendChild(kpi('Ticket promedio', currency(avg)));
 }
 
-/* ========= Sparkline simple ========= */
+/* ========= Sparkline ========= */
 function renderSpark(ym){
   const cvs=$('#spark'); const ctx=cvs.getContext('2d');
   cvs.width=cvs.clientWidth; cvs.height=cvs.clientHeight;
@@ -328,24 +314,18 @@ function renderSpark(ym){
   ctx.lineWidth=2; ctx.strokeStyle='#7d3c98'; ctx.stroke();
 }
 
-/* ========= Tabla de pedidos ========= */
+/* ========= Tabla ========= */
 let lastSearch=''; let lastStatus='all'; let lastChannel='all';
 function renderOrders(ym){
   const tbody=$('#ordersTable tbody'); tbody.innerHTML='';
-  let data=monthOrders(ym).map(o=>({
-    ...o,
-    _date:new Date(o.date.replace(' ','T')),
-  }));
-  // filtros
+  let data=monthOrders(ym).map(o=>({...o,_date:new Date(o.date.replace(' ','T'))}));
   if(lastStatus!=='all') data=data.filter(o=> lastStatus==='ok'? o.status!=='cancelado' : o.status==='cancelado');
   if(lastChannel!=='all') data=data.filter(o=> (o.channel||'web')===lastChannel);
   if(lastSearch.trim()){
     const s=lastSearch.trim().toLowerCase();
     data=data.filter(o=> (o.id + (o.customer?.name||'') + (o.customer?.email||'')).toLowerCase().includes(s));
   }
-  // sort por fecha
   data.sort((a,b)=> a._date-b._date);
-  // rows
   if(!data.length){
     tbody.innerHTML='<tr><td colspan="6" class="muted">Sin compras para los filtros seleccionados.</td></tr>';
     return;
@@ -428,13 +408,10 @@ function stepMonth(delta){
 }
 
 /* ========= Init ========= */
-document.getElementById('year').textContent=new Date().getFullYear();
 paintAuth();
+buildMonthList();
 if(isLogged()){
-  buildMonthList();
-  selectMonth('2025-10'); // por defecto
-}else{
-  buildMonthList(); // que ya se vean los meses aunque no hayas iniciado sesión
+  selectMonth('2025-10'); // por defecto si ya hay sesión
 }
 </script>
 </body>

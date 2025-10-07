@@ -3,188 +3,163 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chocomanía · B‑17 Descarga de reportes</title>
-  <meta name="description" content="Descarga de reporte mensual: vista de estadísticas, acción Descargar PDF y confirmación con nombre estandarizado.">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Chocomanía — B-17 Descarga de reportes (skeleton)</title>
   <style>
-    :root{ --gap:16px; --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.08); --bg:#f6f7fb; --card:#ffffff; --ink:#111827; --muted:#6b7280; --brand:#7d3c98; --border:#e5e7eb; }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0; background:var(--bg); color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
-    a{color:var(--brand); text-decoration:none}
-    a:hover{text-decoration:underline}
-    .container{max-width:1140px; margin:0 auto; padding:20px}
+    :root { --gap:16px; --border:2px; --radius:12px; }
+    * { box-sizing:border-box; } /* BOX MODEL */
+    body { margin:0; padding:var(--gap); font-family:system-ui, Segoe UI, Roboto, sans-serif; background:#f6f7fb; }
 
-    header.top{position:sticky; top:0; z-index:30; backdrop-filter:saturate(180%) blur(8px); background:rgba(246,247,251,.86); border-bottom:1px solid var(--border)}
-    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px}
-    .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem}
-    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#522a7a,#aa6bc8); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+    /* Header */
+    .header{
+      border:var(--border) dashed #bbb; padding:var(--gap); border-radius:var(--radius); margin-bottom:var(--gap);
+      display:flex; align-items:center; justify-content:space-between; /* FLEX */
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } /* FLEX */
+    .tag{ font-size:.75rem; padding:2px 8px; border:1px dashed #aaa; border-radius:999px; }
+    .small{ font-size:.85rem; color:#555; }
 
-    .section{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:18px}
-    .stats{display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff}
-    .box{border:1px dashed #cfcfcf; border-radius:10px; padding:12px; background:#fafafa}
-    .box h4{margin:0 0 8px}
+    /* Secciones / tarjetas */
+    .section{ border:var(--border) dashed #9e9e9e; border-radius:var(--radius); padding:var(--gap); background:#fff; margin-bottom:var(--gap); }
 
-    .bar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
-    .btn, .link-btn{display:inline-block; padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; text-decoration:none; color:inherit}
+    /* Panel de estadísticas (dos columnas) */
+    .stats{
+      display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap);  /* GRID SYSTEM */
+      border:1px dashed #ddd; border-radius:10px; padding:16px; background:#fff;
+    }
+    .box{ border:1px dashed #cfcfcf; border-radius:10px; padding:12px; background:#fafafa; }
+    .box h4{ margin:0 0 8px; }
 
-    .modal{width:min(460px, 92vw); margin:10px auto; padding:16px; border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center}
-    .filelink{text-decoration:underline}
+    /* Barra superior con acción de descarga */
+    .bar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; /* FLEX */
+    }
+    .btn, .link-btn{
+      padding:10px 16px; border:1px solid #666; border-radius:999px; background:#eee; cursor:pointer; text-decoration:none; color:inherit;
+    }
 
-    .muted{color:var(--muted)}
-    /* Toast */
-    .toast-wrap{position:fixed; top:18px; right:18px; display:grid; gap:10px; z-index:50}
-    .toast{background:#111827; color:#fff; padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(-10px); transition:.25s}
-    .toast.show{opacity:1; transform:translateY(0)}
-
-    /* Print styles for the PDF view */
-    @media print{ .noprint{display:none !important} }
+    /* Modal/confirmación de archivo descargado */
+    .modal{
+      width:min(460px, 92vw); margin:10px auto; padding:16px;
+      border:2px dashed #bdbdbd; border-radius:12px; background:#fafafa;
+      display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; /* FLEX */
+    }
+    .filelink{ text-decoration:underline; }
   </style>
 </head>
 <body>
-  <header class="top noprint">
-    <div class="container topbar">
-      <div class="brand"><div class="logo" aria-hidden="true"></div> Chocomanía</div>
-      <div style="display:flex; gap:8px; align-items:center">
-        <button class="btn" id="seedBtn" type="button">Sembrar demo</button>
-        <button class="btn" id="clearBtn" type="button">Limpiar</button>
-      </div>
+  <header class="header">
+    <div class="row">
+      <strong>Chocomanía</strong>
+      <span class="tag">B-17 • Descarga de reportes</span>
+      <span class="tag">wireframe</span>
     </div>
+    <div class="small">HTML5 + Grid + Flex + Box Model</div>
   </header>
 
-  <main class="container">
-    <!-- Escenario 1 -->
-    <section class="section" aria-labelledby="esc1">
-      <div class="bar">
-        <h2 id="esc1">Estadísticas <span id="monthTitle">Enero 2025</span></h2>
-        <div style="display:flex; gap:8px; align-items:center">
-          <a class="link-btn" id="dlPdf" href="#">Descargar PDF</a>
-          <a class="link-btn" id="dlCsv" href="#">Descargar CSV</a>
-        </div>
+  <!-- ========== Escenario 1: Vista de estadísticas + Descargar PDF ========== -->
+  <section class="section" aria-labelledby="esc1">
+    <div class="bar">
+      <h2 id="esc1">Estadísticas Enero 2025</h2>
+      <!-- acción principal del flujo -->
+      <a class="link-btn" id="dlPdf" href="#">Descargar PDF</a>
+      <!-- (opcional) también podrías añadir: <a class="link-btn" href="#">Descargar Excel</a> -->
+    </div>
+
+    <div class="stats">
+      <div class="box">
+        <h4><b>Productos:</b></h4>
+        <ol id="prodList">
+          <li>Chocolate Dubai</li>
+          <li>Bombones Surtidos</li>
+          <li>Frutillas con chocolate</li>
+          <li>Chocolate Amargo 70%</li>
+          <li>Chocolate Caliente</li>
+        </ol>
       </div>
-
-      <div class="stats">
-        <div class="box">
-          <h4><b>Productos:</b></h4>
-          <ol id="prodList">
-            <li>Chocolate Dubai</li>
-            <li>Bombones Surtidos</li>
-            <li>Frutillas con chocolate</li>
-            <li>Chocolate Amargo 70%</li>
-            <li>Chocolate Caliente</li>
-          </ol>
-        </div>
-        <div class="box">
-          <h4><b>Vendidos:</b></h4>
-          <ol id="qtyList">
-            <li>72 pedidos</li>
-            <li>64 pedidos</li>
-            <li>47 pedidos</li>
-            <li>29 pedidos</li>
-            <li>14 pedidos</li>
-          </ol>
-        </div>
+      <div class="box">
+        <h4><b>Vendidos:</b></h4>
+        <ol id="qtyList">
+          <li>72 pedidos</li>
+          <li>64 pedidos</li>
+          <li>47 pedidos</li>
+          <li>29 pedidos</li>
+          <li>14 pedidos</li>
+        </ol>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Escenario 2: Archivo descargado (layout/confirmación) -->
-    <section class="section" aria-labelledby="esc2">
-      <h2 id="esc2">Archivo Descargado</h2>
-      <div class="modal">
-        <a id="fileName" class="filelink" href="#">Reporte_Ventas_202501.pdf</a>
-        <button class="btn" id="openBtn" type="button">Abrir</button>
-        <div class="muted">(Vista de confirmación/estándar de nombre de archivo)</div>
-      </div>
-    </section>
-  </main>
-
-  <div class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
-
-  <footer class="container noprint" style="margin:18px auto 24px; color:var(--muted); text-align:center">© <span id="year"></span> Chocomanía · Descarga de reportes</footer>
+  <!-- ========== Escenario 2: Archivo descargado ========== -->
+  <section class="section" aria-labelledby="esc2">
+    <h2 id="esc2">Archivo Descargado</h2>
+    <div class="modal">
+      <a class="filelink" id="fileName" href="#">Reporte_Ventas_202501.pdf</a>
+      <button class="btn" id="openBtn" type="button">Abrir</button>
+    </div>
+  </section>
 
   <script>
-    // ===== Utilidades =====
-    const $=(s)=>document.querySelector(s);
-    function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.querySelector('.toast-wrap').appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),200); }, 2200); }
-    function currency(n){ return n.toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}); }
+    // Util
+    const $ = s => document.querySelector(s);
+    const pad = n => String(n).padStart(2,'0');
+    const monthMap = {
+      'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,
+      'julio':7,'agosto':8,'septiembre':9,'octubre':10,'noviembre':11,'diciembre':12
+    };
 
-    // ===== Claves de storage reutilizadas de Partes 15-16 =====
-    const LS_STATS='choco_stats'; // { '2025-01': { products:[{name,qty}], ... } }
-    const YM='2025-01'; // Enero 2025 para este flujo
-
-    // ===== Datos de apoyo / demo =====
-    function seedDemo(){
-      const stats={
-        '2025-01': { products:[
-          {name:'Chocolate Dubai', qty:72},
-          {name:'Bombones Surtidos', qty:64},
-          {name:'Frutillas con chocolate', qty:47},
-          {name:'Chocolate Amargo 70%', qty:29},
-          {name:'Chocolate Caliente', qty:14}
-        ] }
-      };
-      localStorage.setItem(LS_STATS, JSON.stringify(stats));
-      render(); toast('Demo sembrada');
+    function parseYYYYMMFromTitle(){
+      // Toma "Estadísticas Enero 2025"
+      const t = $('#esc1').textContent.trim().toLowerCase();
+      const mName = Object.keys(monthMap).find(k => t.includes(k)) || 'enero';
+      const yMatch = t.match(/(20\d{2})/);
+      const y = yMatch ? yMatch[1] : String(new Date().getFullYear());
+      const ym = y + pad(monthMap[mName]);
+      return { label: mName.charAt(0).toUpperCase()+mName.slice(1) + ' ' + y, ym };
     }
 
-    function loadStats(){ try{return JSON.parse(localStorage.getItem(LS_STATS))||{}}catch{return{}} }
-
-    function fillLists(){
-      const stats=loadStats(); const list=stats[YM]?.products||[];
-      if(!list.length) return;
-      const prod=$('#prodList'); const qty=$('#qtyList'); prod.innerHTML=''; qty.innerHTML='';
-      list.forEach(it=>{ const li1=document.createElement('li'); li1.textContent=it.name; prod.appendChild(li1); const li2=document.createElement('li'); li2.textContent=`${it.qty} pedidos`; qty.appendChild(li2); });
+    function readRows(){
+      const names = [...document.querySelectorAll('#prodList li')].map(li => li.textContent.trim());
+      const qtys  = [...document.querySelectorAll('#qtyList li')].map(li => {
+        const m = li.textContent.match(/(\d+)/); return m? parseInt(m[1],10) : 0;
+      });
+      return names.map((name,i)=>({name, qty: qtys[i] || 0}));
     }
 
-    // ===== Generación CSV =====
-    function downloadCSV(){
-      const stats=loadStats(); const list=stats[YM]?.products||[]; if(!list.length){ toast('Sin datos de demo: usa "Sembrar demo"'); return; }
-      const rows=[['producto','cantidad']]; list.forEach(p=>rows.push([`"${p.name}"`, p.qty]));
-      const csv = rows.map(r=>r.join(',')).join('\n');
-      const blob=new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download=`Reporte_Ventas_${YM.replace('-','')}.csv`; a.click(); URL.revokeObjectURL(url);
-      toast('CSV generado');
-    }
-
-    // ===== Vista Print-to-PDF =====
     function openPrintView(){
-      const stats=loadStats(); const list=stats[YM]?.products||[];
-      const total = list.reduce((s,x)=>s+(x.qty||0),0);
-      const title = 'Reporte de Ventas '+ YM;
-      const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${title}</title>
-      <style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px;color:#111827}h1{margin:0 0 12px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #e5e7eb;padding:8px 10px;text-align:left}tfoot td{font-weight:700}</style>
-      </head><body>
-      <h1>${title}</h1>
-      <table><thead><tr><th>#</th><th>Producto</th><th>Vendidos</th></tr></thead><tbody>
-      ${list.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.qty}</td></tr>`).join('')}
-      </tbody><tfoot><tr><td colspan="2">Total</td><td>${total}</td></tr></tfoot></table>
-      <p style="margin-top:10px;color:#6b7280">Sugerencia: usa la opción "Guardar como PDF" del diálogo de impresión.</p>
-      <script>setTimeout(()=>{try{window.print()}catch(e){}}, 250)<\/script>
+      const { label, ym } = parseYYYYMMFromTitle();
+      const rows = readRows();
+      const total = rows.reduce((s,r)=>s + (r.qty||0), 0);
+      const html = `<!doctype html><html lang="es"><head><meta charset="utf-8">
+        <title>Reporte de Ventas — ${label}</title>
+        <style>
+          body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding:24px; color:#111827}
+          h1{margin:0 0 12px}
+          table{border-collapse:collapse; width:100%}
+          td,th{border:1px solid #e5e7eb; padding:8px 10px; text-align:left}
+          tfoot td{font-weight:700}
+        </style></head><body>
+        <h1>Reporte de Ventas — ${label}</h1>
+        <table>
+          <thead><tr><th>#</th><th>Producto</th><th>Vendidos</th></tr></thead>
+          <tbody>
+            ${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.qty}</td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td colspan="2">Total</td><td>${total}</td></tr></tfoot>
+        </table>
+        <script>setTimeout(()=>{try{window.print()}catch(e){}},250)<\/script>
       </body></html>`;
-      const w=window.open('', '_blank', 'width=800,height=900'); w.document.write(html); w.document.close();
+      const w = window.open('', '_blank', 'width=820,height=900');
+      w.document.write(html); w.document.close();
+
+      // actualiza el nombre mostrado (no cambia el texto que tú dejaste)
+      $('#fileName').setAttribute('data-fn', `Reporte_Ventas_${ym}.pdf`);
     }
 
-    // ===== UI de descarga (confirmación/nombre estandarizado) =====
-    function updateDownloadedName(){
-      const link=$('#fileName'); const fn = `Reporte_Ventas_${YM.replace('-','')}.pdf`; link.textContent=fn; link.href='javascript:void(0)';
-    }
-
-    function render(){ fillLists(); updateDownloadedName(); }
-
-    // ===== Eventos =====
-    document.getElementById('seedBtn').addEventListener('click', seedDemo);
-    document.getElementById('clearBtn').addEventListener('click', ()=>{ localStorage.removeItem(LS_STATS); render(); toast('Datos limpiados'); });
-    document.getElementById('dlPdf').addEventListener('click', (e)=>{ e.preventDefault(); if(!loadStats()[YM]){ toast('Sin datos de demo: usa "Sembrar demo"'); return; } openPrintView(); toast('Abriendo vista para guardar como PDF'); });
-    document.getElementById('dlCsv').addEventListener('click', (e)=>{ e.preventDefault(); downloadCSV(); });
-    document.getElementById('openBtn').addEventListener('click', ()=>{ openPrintView(); });
-
-    // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    // Si el usuario ya sembró en la parte 16, reutilizamos; si no, puedes pulsar "Sembrar demo"
-    render();
+    // Enlazar acciones sin cambiar tu layout/estilos
+    $('#dlPdf').addEventListener('click', (e)=>{ e.preventDefault(); openPrintView(); });
+    $('#openBtn').addEventListener('click', openPrintView);
+    // Si clican el nombre, también re-abrimos (opcional pero útil)
+    $('#fileName').addEventListener('click', (e)=>{ e.preventDefault(); openPrintView(); });
   </script>
 </body>
 </html>
